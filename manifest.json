@@ -1,0 +1,7 @@
+{
+  "version": "1.0.0",
+  "bundleUrl": "https://qcvn10-data.pages.dev/bundles/bundle-latest.html",
+  "changelog": "v1.0.0 (2026-05-25)\n- Phát hành chính thức\n- 190 loại công trình QCVN 10:2025/BCA\n- Tính toán lưu lượng TCVN 7336:2021\n- Chiều cao PCCC theo QCVN 06:2022",
+  "minApp": 1,
+  "releaseDate": "2026-05-25"
+}
