@@ -1,4 +1,4 @@
-# Chính sách quyền riêng tư — TRACUUđúng  PCCC
+# Chính sách quyền riêng tư — TRA CỨU PCCC
 
 Cập nhật: 25/05/2026
 
