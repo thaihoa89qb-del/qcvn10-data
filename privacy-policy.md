@@ -1,9 +1,9 @@
 # Chính sách quyền riêng tư — TRA CỨU PCCC
 
-Cập nhật: 25/05/2026
+Cập nhật: 05/06/2026
 
 ## Dữ liệu thu thập
-Ứng dụng QCVN10 PCCC không thu thập, lưu trữ hoặc chia sẻ
+Ứng dụng Sổ tay PCCC không thu thập, lưu trữ hoặc chia sẻ
 bất kỳ thông tin cá nhân nào của người dùng.
 
 ## Dữ liệu lưu trên thiết bị
