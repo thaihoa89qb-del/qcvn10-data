@@ -1,7 +1,11 @@
 {
-  "version": "1.0.0",
-  "bundleUrl": "https://cdn.jsdelivr.net/gh/thaihoa89qb-del/qcvn10-data@main/bundles/bundle-latest.html",
-  "changelog": "v1.0.0 (2026-05-25)\n- Phát hành chính thức\n- 190 loại công trình QCVN 10:2025/BCA\n- Tính toán lưu lượng TCVN 7336:2021\n- Chiều cao PCCC theo QCVN 06:2022",
-  "minApp": 1,
-  "releaseDate": "2026-05-25"
+  "version": "2026.06.30.2101",
+  "appMinCode": 1,
+  "bundleUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/bundles/bundle-latest.html",
+  "rulesUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/rules.json",
+  "rulesVersion": "1.0.0",
+  "tracuuUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/tracuu.json",
+  "tracuuVersion": "2026.06.30.2101",
+  "notes": "Bản 1.1.0: 2 gói thuê bao (15k/79k, bỏ vĩnh viễn) + nhãn tiết kiệm ~56%; PDF có khung + thông số bể/bơm; lưu lịch sử đặt tên & mở lại sửa; sửa bình tích áp về cỡ thực tế; nút Đổi CT reset thông số; bundle có khoá bản thử nghiệm 1.0.x.",
+  "publishedAt": "2026-06-22"
 }
