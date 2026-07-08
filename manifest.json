@@ -1,11 +1,11 @@
 {
-  "version": "2026.06.30.2101",
+  "version": "2026.06.22.1000",
   "appMinCode": 1,
   "bundleUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/bundles/bundle-latest.html",
   "rulesUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/rules.json",
   "rulesVersion": "1.0.0",
   "tracuuUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/tracuu.json",
-  "tracuuVersion": "2026.06.30.2101",
-  "notes": "Bản 1.1.0: 2 gói thuê bao (15k/79k, bỏ vĩnh viễn) + nhãn tiết kiệm ~56%; PDF có khung + thông số bể/bơm; lưu lịch sử đặt tên & mở lại sửa; sửa bình tích áp về cỡ thực tế; nút Đổi CT reset thông số; bundle có khoá bản thử nghiệm 1.0.x.",
+  "tracuuVersion": "2026.06.04.2356",
+  "notes": "Bản 1.1.0: 2 gói thuê bao (15k/79k) + nhãn tiết kiệm ~56%; PDF có khung + thông số bể/bơm; lưu lịch sử đặt tên & mở lại sửa; sửa bình tích áp về cỡ thực tế; nút Đổi CT reset thông số; bundle có khoá bản thử nghiệm 1.0.x.",
   "publishedAt": "2026-06-22"
 }
