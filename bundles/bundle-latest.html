@@ -1320,7 +1320,7 @@ window.addEventListener('unhandledrejection',function(e){try{if(window.AndroidBr
  *       • Cập nhật CDN .../qcvn10-data@main/bundles/bundle-latest.html
  *       • Tăng version trong manifest.json (OTA)
  * ==========================================================================*/
-var APP_BUILD='2026.07.15.0300'; /* phiên bản bundle — tự stamp theo ngày-giờ build (stamp.sh) */
+var APP_BUILD='2026.07.15.0400'; /* phiên bản bundle — tự stamp theo ngày-giờ build (stamp.sh) */
 /* BOOTSTRAP RULES: nếu chạy trong app Android (có AndroidBridge), lấy rules JSON
  * do native cung cấp (đã fetch từ GitHub + cache, fallback bản nhúng trong APK).
  * Chạy trong trình duyệt thường (không có bridge) → bỏ qua, dùng R nhúng bên dưới. */
@@ -6474,7 +6474,14 @@ PM.branchName = function(id){ var l=PM.branchList(); for(var i=0;i<l.length;i++)
 PM.curProjects = function(){ var a=PM.active||'main'; return (PM.projects||[]).filter(function(p){return (p.branch||'main')===a;}); };
 PM.toast = function(m){ try{ if(window.AndroidBridge&&AndroidBridge.toast){AndroidBridge.toast(m);return;} }catch(e){} try{ if(typeof _showToast==='function')_showToast(m,2500);}catch(e){} };
 
-function P5(){ var p=document.getElementById('p5'); if(!p)return; PM.load();
+function P5(){ var p=document.getElementById('p5'); if(!p)return;
+  /* App CŨ (có cầu nối nhưng thiếu setProjects) -> KHÔNG cho dùng, tránh nhập xong mất sạch.
+     Trình duyệt xem thử (không có AndroidBridge) vẫn chạy chế độ mẫu như cũ. */
+  if(window.AndroidBridge && !AndroidBridge.setProjects){
+    p.innerHTML='<div class="card" style="text-align:center;padding:26px 18px"><div style="font-size:34px">🔄</div><h3 style="margin:10px 0 6px">Cần cập nhật ứng dụng</h3><p style="color:var(--t3,#777);font-size:13.5px;line-height:1.5">Mục <b>Quản lý công việc PCCC</b> cần bản ứng dụng mới hơn để lưu dữ liệu an toàn trên máy.<br>Vui lòng cập nhật <b>Sổ tay PCCC</b> trên CH Play rồi quay lại.</p></div>';
+    window.scrollTo(0,0); return;
+  }
+  PM.load();
   var ids=PM.branchList().map(function(b){return b.id;}); if(ids.indexOf(PM.active)<0)PM.active='main';
   PM.view='list'; PM.cur=null; PM.refresh(); window.scrollTo(0,0); }
 PM.refresh = function(){ var p=document.getElementById('p5'); if(!p)return;
