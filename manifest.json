@@ -1,11 +1,11 @@
 {
-  "version": "2026.06.22.1000",
+  "version": "2026.07.15.0300",
   "appMinCode": 1,
   "bundleUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/bundles/bundle-latest.html",
   "rulesUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/rules.json",
   "rulesVersion": "1.0.0",
   "tracuuUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/tracuu.json",
-  "tracuuVersion": "2026.06.04.2356",
-  "notes": "Bản 1.1.0: 2 gói thuê bao (15k/79k) + nhãn tiết kiệm ~56%; PDF có khung + thông số bể/bơm; lưu lịch sử đặt tên & mở lại sửa; sửa bình tích áp về cỡ thực tế; nút Đổi CT reset thông số; bundle có khoá bản thử nghiệm 1.0.x.",
-  "publishedAt": "2026-06-22"
+  "tracuuVersion": "2026.07.15.0300",
+  "notes": "Sửa lỗi bảng Đối chiếu không hiện nội dung (các mục đều 0). Thêm mục Quản lý công việc PCCC: tiến độ + Gantt, vòng thẩm định, hợp đồng & thanh toán tự tính %, chia nhánh, nhắc hạn, lưu kết quả tra cứu. Sửa lỗi trừ nhầm lượt Chuyên gia sau khi xem quảng cáo. Hiệu ứng bấm rõ hơn; báo trạng thái khi đăng nhập Google.",
+  "publishedAt": "2026-07-15"
 }
