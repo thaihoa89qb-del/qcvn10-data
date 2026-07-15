@@ -1321,7 +1321,7 @@ window.addEventListener('unhandledrejection',function(e){try{if(window.AndroidBr
  *       • Cập nhật CDN .../qcvn10-data@main/bundles/bundle-latest.html
  *       • Tăng version trong manifest.json (OTA)
  * ==========================================================================*/
-var APP_BUILD='2026.07.15.0600'; /* phiên bản bundle — tự stamp theo ngày-giờ build (stamp.sh) */
+var APP_BUILD='2026.07.15.0800'; /* phiên bản bundle — tự stamp theo ngày-giờ build (stamp.sh) */
 /* BOOTSTRAP RULES: nếu chạy trong app Android (có AndroidBridge), lấy rules JSON
  * do native cung cấp (đã fetch từ GitHub + cache, fallback bản nhúng trong APK).
  * Chạy trong trình duyệt thường (không có bridge) → bỏ qua, dùng R nhúng bên dưới. */
@@ -1397,21 +1397,20 @@ function _renderAccount(){
     }
     h+="<div class='sheet-item' onclick=\"try{AndroidBridge.signOut()}catch(e){}\"><div class='sheet-item-icon' style='background:#f1f5f9;color:#475569'>↩</div><div class='sheet-item-text'>Đăng xuất</div></div>";
   } else {
-    h+="<div class='sheet-item' onclick=\"_doLogin()\"><div class='sheet-item-icon' style='background:#eff6ff;color:#2563eb'>🔑</div><div class='sheet-item-text'>Đăng nhập bằng Google<div class='sheet-item-sub'>Để dùng chế độ Chuyên gia (tặng 10 lượt)</div></div><span class='sheet-item-arr'>›</span></div>";
+    h+="<div class='sheet-item' id='btnLogin' onclick=\"_doLogin()\"><div class='sheet-item-icon' style='background:#eff6ff;color:#2563eb'>🔑</div><div class='sheet-item-text'>Đăng nhập bằng Google<div class='sheet-item-sub'>Để dùng chế độ Chuyên gia (tặng 10 lượt)</div></div><span class='sheet-item-arr'>›</span></div>";
   }
   h+="</div>";
   el.innerHTML=h;
+  /* Gắn sự kiện TRỰC TIẾP: một số WebView không kích hoạt onclick nội tuyến
+     nằm trong nội dung được chèn bằng innerHTML → nút Đăng nhập bấm không ăn.
+     _doLogin có chống bấm trùng nên dù cả 2 cùng chạy cũng không mở 2 lần. */
+  try{ var _lb=document.getElementById('btnLogin');
+    if(_lb){ _lb.addEventListener('click',function(ev){ try{ev.preventDefault();ev.stopPropagation();}catch(e){} _doLogin(); }, false);
+             _lb.addEventListener('touchend',function(ev){ _doLogin(); }, false); }
+  }catch(e){}
   try{ if(AndroidBridge.refreshAccount) AndroidBridge.refreshAccount(); }catch(e){}
 }
 /* Native gọi sau khi đăng nhập/đăng xuất/đổi lượt → cập nhật lại mục Tài khoản */
-window._doLogin=function(){var B=window.AndroidBridge;
-  var say=function(m){try{if(B&&B.toast)B.toast(m);}catch(e){}};
-  if(!B){say("Không có cầu nối ứng dụng");return;}
-  if(!B.signIn){say("Bản ứng dụng này chưa hỗ trợ nút đăng nhập — vui lòng cập nhật app");return;}
-  try{B.signIn();}catch(e){say("Không mở được đăng nhập: "+e);try{if(B.recordError)B.recordError("doLogin: "+e);}catch(_){} return;}
-  try{if(window._loginOverlay)_loginOverlay(true);}catch(e){}
-};
-window._loginOverlay=function(show,title,sub){var o=document.getElementById("loginOv");if(!o)return;if(show){try{o.querySelector(".lo-t").textContent=title||"Đang mở đăng nhập Google…";o.querySelector(".lo-s").textContent=sub||"Vui lòng chờ vài giây. Bảng chọn tài khoản Google có thể hiện hơi lâu trên một số máy.";}catch(e){}o.classList.add("on");clearTimeout(window._loginOvT);window._loginOvT=setTimeout(function(){o.classList.remove("on");},20000);}else{o.classList.remove("on");clearTimeout(window._loginOvT);}};
 window.__adLoading=function(show){_loginOverlay(!!show,"Đang tải quảng cáo…","Vui lòng chờ vài giây, quảng cáo sẽ hiện. Xem xong sẽ được +2 lượt.");};
 window.__accountChanged=function(){ try{_loginOverlay(false);}catch(e){} _renderAccount(); };
 function _closeSet(){
@@ -6819,4 +6818,26 @@ function _pmSaveResultToProject(){
 
 </script>
 <div id="loginOv" onclick="try{_loginOverlay(false)}catch(e){}"><div class="lo-box"><div class="lo-sp"></div><div class="lo-t">Đang mở đăng nhập Google…</div><div class="lo-s">Vui lòng chờ vài giây. Bảng chọn tài khoản Google có thể hiện hơi lâu trên một số máy.</div><div class="lo-x">Chạm để đóng</div></div></div>
+<script>
+/* ============================================================
+   KHỐI RIÊNG — CỐ Ý TÁCH KHỎI KHỐI SCRIPT LỚN.
+   Lý do: các hàm này được gán kiểu window.X = function(){}. Nếu khối lớn ném lỗi
+   ở BẤT KỲ dòng nào phía trước (vd: trạng thái chưa đăng nhập), lệnh gán sẽ KHÔNG
+   chạy -> nút Đăng nhập bấm không có gì xảy ra. Tách riêng thì luôn được định nghĩa.
+   ============================================================ */
+window._loginOverlay=function(show,title,sub){var o=document.getElementById("loginOv");if(!o)return;
+  if(show){try{o.querySelector(".lo-t").textContent=title||"Đang mở đăng nhập Google…";
+    o.querySelector(".lo-s").textContent=sub||"Vui lòng chờ vài giây. Bảng chọn tài khoản Google có thể hiện hơi lâu trên một số máy.";}catch(e){}
+    o.classList.add("on");clearTimeout(window._loginOvT);
+    window._loginOvT=setTimeout(function(){o.classList.remove("on");},20000);}
+  else{o.classList.remove("on");clearTimeout(window._loginOvT);}};
+window._doLogin=function(){var B=window.AndroidBridge;
+  var now=Date.now(); if(window.__loginTs && now-window.__loginTs<900) return; window.__loginTs=now;
+  var say=function(m){try{if(B&&B.toast)B.toast(m);}catch(e){}};
+  if(!B){say("Không có cầu nối ứng dụng");return;}
+  if(!B.signIn){say("Bản ứng dụng này chưa hỗ trợ nút đăng nhập — vui lòng cập nhật app");return;}
+  try{B.signIn();}catch(e){say("Không mở được đăng nhập: "+e);try{if(B.recordError)B.recordError("doLogin: "+e);}catch(_){} return;}
+  try{if(window._loginOverlay)_loginOverlay(true);}catch(e){}
+};
+</script>
 </body></html>
