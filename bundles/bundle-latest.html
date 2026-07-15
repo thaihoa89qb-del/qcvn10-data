@@ -1321,7 +1321,7 @@ window.addEventListener('unhandledrejection',function(e){try{if(window.AndroidBr
  *       • Cập nhật CDN .../qcvn10-data@main/bundles/bundle-latest.html
  *       • Tăng version trong manifest.json (OTA)
  * ==========================================================================*/
-var APP_BUILD='2026.07.15.0800'; /* phiên bản bundle — tự stamp theo ngày-giờ build (stamp.sh) */
+var APP_BUILD='2026.07.15.1200'; /* phiên bản bundle — tự stamp theo ngày-giờ build (stamp.sh) */
 /* BOOTSTRAP RULES: nếu chạy trong app Android (có AndroidBridge), lấy rules JSON
  * do native cung cấp (đã fetch từ GitHub + cache, fallback bản nhúng trong APK).
  * Chạy trong trình duyệt thường (không có bridge) → bỏ qua, dùng R nhúng bên dưới. */
@@ -6272,8 +6272,10 @@ details.stds>summary{font-size:12.5px;color:var(--t2)}
 .tbxwrap th,.tbxwrap td{border:1px solid var(--border);padding:5px 7px;text-align:center;vertical-align:middle;color:var(--t1)}
 .tbxwrap thead th{background:var(--head);color:var(--fire);font-weight:700}
 .tbxwrap td p,.tbxwrap th p{margin:0}
+.lnk{color:var(--fire);font-weight:700;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.lnk:active{opacity:.6}
 </style></head><body>
-<div class="hd"><button class="back" id="backBtn" onclick="showList()">‹ Danh sách</button><h1 id="hdTitle">📚 Bảng đối chiếu thẩm định PCCC</h1></div>
+<div class="hd"><button class="back" id="backBtn" onclick="goBack()">‹ Danh sách</button><h1 id="hdTitle">📚 Bảng đối chiếu thẩm định PCCC</h1></div>
 <div class="wrap">
   <div id="listView">
     <div class="tabs"><button class="tab on" id="tabB" onclick="setTab('b')">Công trình</button><button class="tab" id="tabS" onclick="setTab('s')">Hệ thống</button></div>
@@ -6297,6 +6299,9 @@ function fmt(t){
   t = t.replace(/(CHÚ THÍCH\s*\d*\s*:?|CHÚ DẪN\s*:?|Lưu ý\s*:?)/g, '<br><b>$1</b>');
   t = t.replace(/(Bảng\s+[A-Z]\.?\d[\d.]*)/g, '<br><b>$1</b>');
   t = t.replace(/^(<br>)+/, '');
+  if(/đối\s*chiếu/i.test(t)){
+    t = t.replace(/\b([AB]\d{1,2})\b/g, function(m,c){ return byCode(c) ? '<span class="lnk" role="link" tabindex="0" data-code="'+c+'">'+c+'</span>' : m; });
+  }
   return t;
 }
 function isSec(r){return (!r.tk||!r.tk.trim()) && (!r.qd||!r.qd.trim()) && (!r.cc||!r.cc.trim()) && (r.muc&&r.muc.trim());}
@@ -6307,6 +6312,7 @@ function setTab(t){
   renderList(); showList();
 }
 function showList(){
+  navStack=[]; curCode=null;
   document.getElementById('detailView').style.display='none';
   document.getElementById('listView').style.display='';
   document.getElementById('backBtn').classList.remove('on');
@@ -6345,21 +6351,39 @@ function renderDetail(d){
   }
   return h;
 }
-function openR(code){
-  var d=byCode(code); if(!d){showList();return;}
-  // đặt tab theo nhóm chứa mã
-  var inSys=false; for(var i=0;i<SYS.length;i++){if(SYS[i].code===code){inSys=true;break;}}
+var navStack=[];
+var curCode=null;
+function _showDetail(d){
+  var inSys=false; for(var i=0;i<SYS.length;i++){if(SYS[i].code===d.code){inSys=true;break;}}
   curCat=inSys?'s':'b';
   document.getElementById('tabB').classList.toggle('on',curCat==='b');
   document.getElementById('tabS').classList.toggle('on',curCat==='s');
   document.getElementById('detailView').innerHTML=renderDetail(d);
   document.getElementById('detailView').style.display='';
   document.getElementById('listView').style.display='none';
-  document.getElementById('backBtn').classList.add('on');
+  curCode=d.code;
+  var bb=document.getElementById('backBtn'); bb.classList.add('on');
+  if(navStack.length){var pc=navStack[navStack.length-1];var pd=byCode(pc);bb.textContent='‹ '+(pd?pd.code:pc);}
+  else{bb.textContent='‹ Danh sách';}
   document.getElementById('hdTitle').textContent=d.code+' — '+d.name;
   window.scrollTo(0,0);
 }
-window.setTab=setTab; window.openR=openR; window.showList=showList;
+function openR(code){
+  var d=byCode(code); if(!d){showList();return;}
+  navStack=[]; _showDetail(d);
+}
+function goRef(code){
+  var d=byCode(code); if(!d)return false;
+  if(curCode&&curCode!==code)navStack.push(curCode);
+  _showDetail(d); return false;
+}
+function goBack(){
+  if(navStack.length){var prev=navStack.pop();var d=byCode(prev);if(d){_showDetail(d);return;}}
+  showList();
+}
+window.setTab=setTab; window.openR=openR; window.showList=showList; window.goRef=goRef; window.goBack=goBack;
+document.addEventListener('click',function(e){var t=e.target;var a=(t&&t.closest)?t.closest('.lnk'):null;if(a&&a.getAttribute('data-code')){e.preventDefault();goRef(a.getAttribute('data-code'));}});
+document.addEventListener('keydown',function(e){if(e.keyCode!==13&&e.key!=='Enter')return;var a=e.target;if(a&&a.classList&&a.classList.contains('lnk')&&a.getAttribute('data-code')){e.preventDefault();goRef(a.getAttribute('data-code'));}});
 window.__mountTracuu=function(j){try{DATA=(typeof j==='string')?JSON.parse(j):j;B=(DATA&&DATA.b)?DATA.b:[];SYS=(DATA&&DATA.s)?DATA.s:[];renderList();}catch(e){try{document.getElementById('listBox').innerHTML='<p style="padding:16px;color:#b00">Lỗi đọc dữ liệu đối chiếu.</p>';}catch(_){}}};
 try{document.getElementById('listBox').innerHTML='<p style="padding:18px;color:#888">Đang tải dữ liệu đối chiếu…</p>';}catch(e){}
 </SCRIPTSENTINEL>
