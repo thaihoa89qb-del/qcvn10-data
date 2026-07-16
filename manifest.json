@@ -1,11 +1,11 @@
 {
-  "version": "2026.07.16.1500",
+  "version": "2026.07.17.2000",
   "appMinCode": 15,
   "bundleUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/bundles/bundle-latest.html",
   "rulesUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/rules.json",
   "rulesVersion": "1.0.0",
   "tracuuUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/tracuu.json",
-  "tracuuVersion": "2026.07.15.0800",
-  "notes": "Bản sửa lỗi khẩn. Khắc phục lỗi khiến ứng dụng liên tục tự làm mới thông tin tài khoản ở nền: một hàm giao diện gọi lại chính nó không dứt, mỗi vòng lại truy vấn máy chủ một lần. Lỗi này không hiện ra màn hình nhưng âm thầm làm hao pin và dung lượng mạng của máy, đồng thời làm vượt hạn mức truy vấn của dịch vụ. Sau khi cập nhật, ứng dụng chỉ truy vấn máy chủ khi thật sự cần: lúc đăng nhập, mua gói, xem quảng cáo, hoặc khi mở hộp Cài đặt (tối đa một lần mỗi 60 giây). Không thay đổi tính năng nào khác. Nên cập nhật ngay.",
-  "publishedAt": "2026-07-16"
+  "tracuuVersion": "2026.07.17.0900",
+  "notes": "Bổ sung mục Tra cứu QCVN 06:2022 ngay trong ứng dụng: bậc chịu lửa, khoang cháy, thoát nạn, khoảng cách phòng cháy, hút khói và tăng áp chống khói (theo TCVN 5687). Mở từ thanh dưới hoặc từ trang Kết quả — công cụ tự nhận công trình và số liệu đã nhập. Giữ nguyên tính năng bấm mã bảng để mở thẳng bảng và quay lại theo chuỗi, cùng toàn bộ bản vá trước. Không thay đổi cách tính. Nên cập nhật để dùng tính năng mới.",
+  "publishedAt": "2026-07-17"
 }
