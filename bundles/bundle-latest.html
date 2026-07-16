@@ -1321,7 +1321,7 @@ window.addEventListener('unhandledrejection',function(e){try{if(window.AndroidBr
  *       • Cập nhật CDN .../qcvn10-data@main/bundles/bundle-latest.html
  *       • Tăng version trong manifest.json (OTA)
  * ==========================================================================*/
-var APP_BUILD='2026.07.15.1200'; /* phiên bản bundle — tự stamp theo ngày-giờ build (stamp.sh) */
+var APP_BUILD='2026.07.16.1500'; /* phiên bản bundle — tự stamp theo ngày-giờ build (stamp.sh) */
 /* BOOTSTRAP RULES: nếu chạy trong app Android (có AndroidBridge), lấy rules JSON
  * do native cung cấp (đã fetch từ GitHub + cache, fallback bản nhúng trong APK).
  * Chạy trong trình duyệt thường (không có bridge) → bỏ qua, dùng R nhúng bên dưới. */
@@ -1360,7 +1360,7 @@ function _openSet(){
  * Đăng nhập do native xử lý (Credential Manager). Trên trình duyệt thường (không có
  * AndroidBridge) chỉ hiển thị ghi chú "khả dụng trên app". */
 function _subName(pid){return pid==='expert_monthly'?'Gói tháng':(pid==='expert_yearly'?'Gói năm':(pid==='expert_lifetime'?'Gói vĩnh viễn':'Gói Chuyên gia'));}
-function _renderAccount(){
+function _renderAccount(fromNative){
   var el=document.getElementById('acctBox'); if(!el) return;
   if(!(window.AndroidBridge && AndroidBridge.getAccountInfo)){
     el.innerHTML="<div class='sheet-sect'><div class='sheet-sect-title'>Tài khoản</div>"
@@ -1408,11 +1408,20 @@ function _renderAccount(){
     if(_lb){ _lb.addEventListener('click',function(ev){ try{ev.preventDefault();ev.stopPropagation();}catch(e){} _doLogin(); }, false);
              _lb.addEventListener('touchend',function(ev){ _doLogin(); }, false); }
   }catch(e){}
-  try{ if(AndroidBridge.refreshAccount) AndroidBridge.refreshAccount(); }catch(e){}
+  /* CHỐNG VÒNG LẶP — xem BAN-GIAO mục 4.11. Hai lớp:
+     1) fromNative: __accountChanged() do native gọi sau khi ĐÃ refresh() → chỉ vẽ, KHÔNG gọi ngược,
+        nếu gọi ngược sẽ thành vòng vô hạn đốt 1 lượt đọc Firestore mỗi vòng;
+     2) throttle 60 s: chặn mọi đường gọi khác lỡ khép vòng trở lại. */
+  try{
+    if(!fromNative && AndroidBridge.refreshAccount){
+      var _t=Date.now();
+      if(!window.__raLast || _t-window.__raLast>60000){ window.__raLast=_t; AndroidBridge.refreshAccount(); }
+    }
+  }catch(e){}
 }
 /* Native gọi sau khi đăng nhập/đăng xuất/đổi lượt → cập nhật lại mục Tài khoản */
 window.__adLoading=function(show){_loginOverlay(!!show,"Đang tải quảng cáo…","Vui lòng chờ vài giây, quảng cáo sẽ hiện. Xem xong sẽ được +2 lượt.");};
-window.__accountChanged=function(){ try{_loginOverlay(false);}catch(e){} _renderAccount(); };
+window.__accountChanged=function(){ try{_loginOverlay(false);}catch(e){} _renderAccount(true); };
 function _closeSet(){
   document.getElementById('setBg').classList.remove('on');
   document.getElementById('setSh').classList.remove('on');
