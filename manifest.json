@@ -1,11 +1,11 @@
 {
-  "version": "2026.07.17.2200",
+  "version": "2026.08.20.1200",
   "appMinCode": 15,
   "bundleUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/bundles/bundle-latest.html",
   "rulesUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/rules.json",
   "rulesVersion": "1.0.0",
   "tracuuUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/tracuu.json",
-  "tracuuVersion": "2026.07.17.0900",
-  "notes": "Thêm tra cứu QCVN 06:2022 ngay trong ứng dụng: bậc chịu lửa, khoang cháy, thoát nạn, khoảng cách PCCC, hút khói và tăng áp chống khói. Bổ sung mục Quản lý công việc PCCC và cải tiến bảng Đối chiếu (đang thử nghiệm). Xuất PDF đặt tên file theo tên công trình. Trang Kết quả dễ nhìn hơn, đồng bộ các nút xổ mở/thu. Cập nhật nguồn tài liệu chính thức (thêm QCVN 06 — Bộ Xây dựng). Cập nhật mục Tài liệu & nguồn chính thức: dẫn theo số hiệu Thông tư ban hành, bỏ liên kết không truy cập được, ghi rõ đây là ứng dụng độc lập không đại diện cơ quan chính phủ. Giữ nguyên tính năng bấm mã bảng và toàn bộ bản vá trước. Không thay đổi cách tính.",
-  "publishedAt": "2026-07-17"
+  "tracuuVersion": "2026.08.20.1200",
+  "notes": "Ứng dụng đổi tên thành \"Sổ tay phòng cháy\". Bổ sung mục Xoá tài khoản trong Cài đặt và ghi rõ điều khoản tự động gia hạn của gói thuê bao. Nội dung, tính năng và cách tính KHÔNG thay đổi. Bổ sung mục Tra cứu QCVN 06:2022 ngay trong ứng dụng: bậc chịu lửa, khoang cháy, thoát nạn, khoảng cách phòng cháy, hút khói và tăng áp chống khói (theo TCVN 5687). Mở từ thanh dưới hoặc từ trang Kết quả — công cụ tự nhận công trình và số liệu đã nhập. Giữ nguyên tính năng bấm mã bảng để mở thẳng bảng và quay lại theo chuỗi, cùng toàn bộ bản vá trước. Không thay đổi cách tính. Nên cập nhật để dùng tính năng mới. Bổ sung tên cho các mục còn để trống trong phần Đối chiếu (B1, B2, B5, B15) — các dòng nối tiếp nay hiển thị đúng tên mục và đánh dấu \"(tiếp)\". Nội dung quy chuẩn và cách tính KHÔNG thay đổi.",
+  "publishedAt": "2026-08-20"
 }
