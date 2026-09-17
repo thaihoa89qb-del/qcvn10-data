@@ -64,7 +64,7 @@
       <strong>Nhà phát triển:</strong> ALMEO DEV TEAM &nbsp;·&nbsp;
       <strong>Liên hệ:</strong> <a href="mailto:thaihoa.89qb@gmail.com">thaihoa.89qb@gmail.com</a><br>
       <strong>Ứng dụng:</strong> ANOVIA — Sổ tay phòng cháy (vn.qcvn10.app; tên cũ: Sổ tay phòng cháy) &nbsp;·&nbsp;
-      <strong>Cập nhật lần cuối:</strong> 15/09/2026
+      <strong>Cập nhật lần cuối:</strong> 17/09/2026
     </div>
 
     <div class="note">
@@ -79,7 +79,12 @@
     <h2>1. Thông tin chúng tôi thu thập</h2>
 
     <h3>1.1. Thông tin tài khoản (khi bạn đăng nhập)</h3>
-    <p>Phần tra cứu cơ bản <strong>dùng được mà không cần đăng nhập</strong> và không cần mạng. <strong>Chế độ Chuyên gia</strong> cần đăng nhập bằng tài khoản Google và có kết nối mạng. Khi bạn đăng nhập, chúng tôi nhận và lưu: <strong>địa chỉ email, tên hiển thị và mã định danh tài khoản (uid)</strong> để xác thực và gắn quyền sử dụng theo tài khoản của bạn. Chúng tôi không nhận mật khẩu Google của bạn.</p>
+    <p>Phần tra cứu cơ bản <strong>dùng được mà không cần đăng nhập</strong> và không cần mạng. <strong>Chế độ Chuyên gia</strong> cần đăng nhập và có kết nối mạng. Bạn chọn một trong hai cách:</p>
+    <ul>
+      <li><strong>Tài khoản Google:</strong> chúng tôi nhận và lưu <strong>địa chỉ email, tên hiển thị và mã định danh tài khoản (uid)</strong>. Chúng tôi không nhận mật khẩu Google của bạn.</li>
+      <li><strong>Email và mật khẩu:</strong> email và mật khẩu do <strong>Google Firebase Authentication</strong> tiếp nhận và lưu (mật khẩu được mã hoá một chiều, chúng tôi không xem được). Ứng dụng gửi thư xác minh tới email của bạn; chỉ email đã xác minh mới dùng được Chế độ Chuyên gia. Chúng tôi lưu <strong>địa chỉ email và mã định danh tài khoản (uid)</strong>. Quên mật khẩu thì đặt lại qua thư gửi tới email đó.</li>
+    </ul>
+    <p>Thông tin tài khoản dùng để xác thực và gắn quyền sử dụng theo tài khoản của bạn.</p>
 
     <h3>1.2. Dữ liệu sử dụng &amp; do bạn nhập trong ứng dụng</h3>
     <p><strong>Lưu cục bộ trên thiết bị của bạn (không tải lên máy chủ của chúng tôi):</strong> các dữ liệu sau chỉ được lưu trong bộ nhớ riêng của ứng dụng trên máy bạn:</p>
@@ -91,6 +96,14 @@
     </ul>
     <p>Nếu thông tin bạn nhập có chứa dữ liệu cá nhân của bên thứ ba (ví dụ tên hoặc số điện thoại của chủ đầu tư), bạn có trách nhiệm bảo đảm mình có cơ sở hợp lệ để lưu các thông tin đó. Vì dữ liệu chỉ nằm trên máy, bạn có thể xóa bất cứ lúc nào bằng nút <em>Xoá toàn bộ dữ liệu trên máy</em> trong <em>Cài đặt › Dữ liệu trên máy</em>, hoặc gỡ cài đặt ứng dụng.</p>
     <p><strong>Lưu trên Google Firebase (Cloud Firestore) gắn với tài khoản của bạn:</strong> chỉ gồm (1) <strong>trạng thái quyền sử dụng</strong> — số lượt dùng thử, tiến độ xem quảng cáo có thưởng, trạng thái gói thuê bao, mã sản phẩm và ngày hết hạn; và (2) <strong>danh sách thiết bị đăng nhập</strong>, tối đa 2 mục, mỗi mục gồm một <strong>mã ngẫu nhiên do ứng dụng tự tạo</strong> (không phải IMEI, số sê-ri hay mã nhận dạng quảng cáo) và thời điểm dùng gần nhất. Danh sách này dùng để giới hạn mỗi tài khoản trên tối đa 2 máy; khi bạn đăng nhập trên máy thứ 3, máy lâu chưa dùng nhất sẽ bị đăng xuất. Chúng tôi <strong>không</strong> lưu lịch sử tra cứu hay dữ liệu dự án của bạn trên máy chủ.</p>
+
+    <h3>1.2b. Đồng bộ Google Drive (chỉ khi bạn bật)</h3>
+    <p>Trong <em>Cài đặt › Đồng bộ dữ liệu</em>, bạn có thể bật <strong>Đồng bộ Google Drive</strong>. Khi bật, ứng dụng xin quyền <strong>drive.appdata</strong> của Google và lưu <strong>bản sao lưu dữ liệu nêu ở mục 1.2</strong> (dự án, lịch sử, bóc khối lượng, thoát nạn, đánh dấu, cài đặt) vào <strong>thư mục dữ liệu ứng dụng ẩn trong Google Drive của chính bạn</strong>. Ứng dụng tự sao lưu khi bạn rời ứng dụng nếu dữ liệu thay đổi, giữ tối đa 3 bản gần nhất, và hỏi bạn trước khi nạp bản sao lưu từ máy khác.</p>
+    <ul>
+      <li>Dữ liệu đi thẳng từ máy bạn tới Google Drive, <strong>không qua máy chủ của chúng tôi</strong>; <strong>chúng tôi không xem được</strong>. Quyền drive.appdata chỉ cho ứng dụng đọc ghi thư mục riêng của nó, <strong>không</strong> đọc được các tệp khác trong Drive của bạn.</li>
+      <li>Việc lưu trữ tuân theo điều khoản và chính sách quyền riêng tư của Google Drive; dung lượng tính vào Google Drive của bạn (thường chỉ vài chục KB).</li>
+      <li>Bạn có thể tắt đồng bộ, bấm <em>Xoá bản sao lưu trên Drive</em> trong ứng dụng, hoặc xoá dữ liệu ẩn của ứng dụng tại <em>Google Drive › Cài đặt › Quản lý ứng dụng</em> bất cứ lúc nào. Khi bạn xoá tài khoản trong ứng dụng mà đồng bộ đang bật, ứng dụng cũng xoá các bản sao lưu này.</li>
+    </ul>
 
     <h3>1.3. Thông tin mua hàng</h3>
     <p>Khi bạn mua gói, giao dịch được xử lý bởi <strong>Google Play Billing</strong>. Chúng tôi chỉ nhận <strong>trạng thái và mã sản phẩm</strong> của giao dịch để mở khóa tính năng; chúng tôi <strong>không thu thập hay lưu trữ thông tin thẻ/ví thanh toán</strong> của bạn.</p>
@@ -121,14 +134,15 @@
     <p>Chúng tôi <strong>không bán</strong> thông tin cá nhân của bạn. Thông tin được xử lý/chia sẻ với các dịch vụ của Google để vận hành ứng dụng:</p>
     <table>
       <tr><th>Dịch vụ</th><th>Mục đích</th></tr>
-      <tr><td>Google Firebase Authentication</td><td>Đăng nhập bằng tài khoản Google</td></tr>
+      <tr><td>Google Drive (chỉ khi bạn bật đồng bộ)</td><td>Lưu bản sao lưu dữ liệu vào thư mục ẩn của ứng dụng trong Google Drive của chính bạn; chúng tôi không xem được</td></tr>
+      <tr><td>Google Firebase Authentication</td><td>Đăng nhập bằng tài khoản Google, hoặc bằng email và mật khẩu (gửi thư xác minh, thư đặt lại mật khẩu)</td></tr>
       <tr><td>Google Cloud Firestore</td><td>Lưu trạng thái quyền/gói theo tài khoản và danh sách tối đa 2 thiết bị đăng nhập (mã ngẫu nhiên do ứng dụng tạo, thời điểm dùng gần nhất)</td></tr>
       <tr><td>Google Play Billing</td><td>Xử lý mua gói thuê bao</td></tr>
       <tr><td>Google AdMob</td><td>Hiển thị &amp; đo lường quảng cáo</td></tr>
       <tr><td>Firebase Crashlytics</td><td>Nhật ký sự cố, chẩn đoán lỗi</td></tr>
       <tr><td>Google Analytics for Firebase</td><td>Thống kê việc sử dụng tính năng (gắn mã cài đặt ứng dụng, không gắn email/tên)</td></tr>
     </table>
-    <p>Lịch sử tra cứu và dữ liệu dự án được lưu trên máy của bạn nên <strong>không</strong> được chia sẻ với các dịch vụ trên, trừ khi chính bạn chủ động xuất/chia sẻ (ví dụ xuất file PDF hoặc Sao lưu).</p>
+    <p>Lịch sử tra cứu và dữ liệu dự án được lưu trên máy của bạn nên <strong>không</strong> được chia sẻ với các dịch vụ trên, trừ khi chính bạn chủ động xuất/chia sẻ (ví dụ xuất file PDF hoặc Sao lưu) hoặc bật Đồng bộ Google Drive (lưu vào Google Drive của chính bạn, xem mục 1.2b).</p>
     <p>Việc xử lý dữ liệu của Google tuân theo chính sách quyền riêng tư của Google:
       <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">https://policies.google.com/privacy</a>.</p>
 
