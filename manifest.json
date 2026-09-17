@@ -1,11 +1,10 @@
 {
-  "version": "2026.08.20.1200",
-  "appMinCode": 15,
+  "version": "2026.09.16.2230",
+  "appMinCode": 20,
   "bundleUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/bundles/bundle-latest.html",
   "rulesUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/rules.json",
   "rulesVersion": "1.0.0",
-  "tracuuUrl": "https://raw.githubusercontent.com/thaihoa89qb-del/qcvn10-data/main/tracuu.json",
   "tracuuVersion": "2026.08.20.1200",
-  "notes": "Ứng dụng đổi tên thành \"Sổ tay phòng cháy\". Bổ sung mục Xoá tài khoản trong Cài đặt và ghi rõ điều khoản tự động gia hạn của gói thuê bao. Nội dung, tính năng và cách tính KHÔNG thay đổi. Bổ sung mục Tra cứu QCVN 06:2022 ngay trong ứng dụng: bậc chịu lửa, khoang cháy, thoát nạn, khoảng cách phòng cháy, hút khói và tăng áp chống khói (theo TCVN 5687). Mở từ thanh dưới hoặc từ trang Kết quả — công cụ tự nhận công trình và số liệu đã nhập. Giữ nguyên tính năng bấm mã bảng để mở thẳng bảng và quay lại theo chuỗi, cùng toàn bộ bản vá trước. Không thay đổi cách tính. Nên cập nhật để dùng tính năng mới. Bổ sung tên cho các mục còn để trống trong phần Đối chiếu (B1, B2, B5, B15) — các dòng nối tiếp nay hiển thị đúng tên mục và đánh dấu \"(tiếp)\". Nội dung quy chuẩn và cách tính KHÔNG thay đổi.",
-  "publishedAt": "2026-08-20"
+  "notes": "ANOVIA — bóc khối lượng thiết bị kèm mã hàng và đơn giá, kiểm tra thoát nạn theo bản vẽ, cấu trúc nhà 80 mẫu, công trình hỗn hợp nhiều khu, tra cứu 1.192 điều khoản của 6 tiêu chuẩn ngay trong máy. Mới: chỉ trừ lượt Chuyên gia khi xem kết quả, xem lại cùng công trình không trừ thêm; thử ngay với công trình mẫu; mục Gần đây ở Trang chủ; chia sẻ kết quả qua Zalo; Cài đặt gọn theo nhóm, chọn cỡ chữ. Tài khoản mới vẫn được tặng 10 lượt dùng thử. Dữ liệu công việc của bản cũ được giữ nguyên.",
+  "publishedAt": "2026-09-15"
 }
