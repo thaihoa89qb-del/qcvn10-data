@@ -691,6 +691,7 @@ try{ if(/Android/i.test(navigator.userAgent)) document.documentElement.classList
       <div class="bd">
         <div class="lbl" style="display:none">Mẫu dựng sẵn</div>
         <div id="anvPresets" style="display:none;"></div>
+        <div id="anvNN"></div>
         <div data-act="openCat" class="row" style="gap:10px;">
           <svg class="isv i18" style="color:var(--ink3);stroke-width:2;"><use href="#i-search"></use></svg>
           <span style="font-size:15px;color:var(--ink3);">Tìm công trình: khách sạn, gara…</span>
@@ -1019,7 +1020,7 @@ try{ if(/Android/i.test(navigator.userAgent)) document.documentElement.classList
           </div>
         </details>
       </div>
-      <div class="sauthor">ANOVIA 3.0.1 · Quân sư kiêm thợ vẽ hệ thống PCCC<br>KS. Nguyễn Hồng Anh · <a href="tel:0933290992">0933 290 992</a><br>KS. Nguyễn Thái Hòa · <a href="tel:0774229777">0774 229 777</a></div>
+      <div class="sauthor">ANOVIA 3.0.2 · Quân sư kiêm thợ vẽ hệ thống PCCC<br>KS. Nguyễn Hồng Anh · <a href="tel:0933290992">0933 290 992</a><br>KS. Nguyễn Thái Hòa · <a href="tel:0774229777">0774 229 777</a></div>
     </div>
   </div>
 
@@ -1745,17 +1746,30 @@ try{ if(/Android/i.test(navigator.userAgent)) document.documentElement.classList
 
 <script>
 (function(){
-  var n=0,last={},hidden=false,hdr=null;
+  /* CHỐNG GIẬT KHI ẨN THANH TIÊU ĐỀ (17/09/2026)
+     Ẩn thanh làm khung cao thêm đúng chiều cao thanh → vị trí cuộn tối đa giảm. Danh sách chỉ dư ít (vd. Chọn
+     công trình dư 73 px, thanh 49 px) thì ẩn xong trình duyệt kẹp vị trí xuống dưới 28 → hiện thanh → lại ẩn…
+     = giật. Nay: chỉ ẩn khi ẩn xong không bị kẹp; bỏ qua scroll trong lúc thanh đang co giãn. */
+  var n=0,last={},hidden=false,hdr=null,lockUntil=0,LOCK_MS=350,TOP=28;
   function setH(v){
     hdr=hdr||document.getElementById('appHdr'); if(!hdr||v===hidden)return;
-    hidden=v; hdr.style.marginTop=v?(-hdr.offsetHeight)+'px':'0px'; hdr.style.opacity=v?'0':'1';
+    hidden=v; lockUntil=Date.now()+LOCK_MS;
+    hdr.style.marginTop=v?(-hdr.offsetHeight)+'px':'0px'; hdr.style.opacity=v?'0':'1';
   }
+  window.anvHdrHidden=function(){ return hidden; };
   document.addEventListener('scroll',function(e){
     var el=e.target; if(!el||el===document||el.nodeType!==1)return;
     var k=el.getAttribute('data-sk'); if(!k){k='s'+(++n);el.setAttribute('data-sk',k);}
     var t=el.scrollTop,p=last[k]||0; last[k]=t;
-    if(t<28){setH(false);return;}
-    if(t-p>5)setH(true); else if(p-t>5)setH(false);
+    if(Date.now()<lockUntil)return;          /* khung đang co giãn: vị trí đổi không phải do người dùng */
+    if(t<TOP){setH(false);return;}
+    if(t-p>5){
+      if(!hidden){
+        var room=el.scrollHeight-el.clientHeight, hh=(hdr||document.getElementById('appHdr')||{}).offsetHeight||0;
+        if(room-hh < Math.max(t,TOP)+12) return;   /* ẩn thanh sẽ kẹp vị trí cuộn → không ẩn */
+      }
+      setH(true);
+    } else if(p-t>5) setH(false);
   },true);
   document.addEventListener('click',function(e){
     if(e.target&&e.target.closest&&e.target.closest('.nav'))setH(false);
@@ -5658,7 +5672,7 @@ function _renderBldDiagram(){
   return h;
 }
 
-var APP_BUILD='2026.09.16.2230';
+var APP_BUILD='2026.09.20.2131';
 
 
 /* stub điều hướng cho HTML port (nút "go(n)" của Bản 1) — vô hại */
@@ -12679,7 +12693,7 @@ function anvGLRender(){
 }
 document.addEventListener('input',function(e){ if(e.target&&e.target.id==='glQ') anvGLRender(); });
 document.addEventListener('click',function(e){ var el=e.target.closest&&e.target.closest('[data-glsrc]'); if(!el) return; _glSrc=el.getAttribute('data-glsrc'); anvGLBoot(); },true);
-var ANV_LEGAL={"about": ["Về ứng dụng", "ANOVIA · Sổ tay phòng cháy — công cụ tra cứu, tính toán sơ bộ và quản lý hồ sơ thiết kế PCCC cho kỹ sư. Phiên bản 3.0.1. Phần tra cứu chạy ngay trong máy, không cần mạng; chế độ Chuyên gia cần đăng nhập Google và có mạng để xác nhận lượt hoặc gói. Phát triển phục vụ công việc thiết kế, thẩm định thiết kế PCCC tại Việt Nam.\n\nANOVIA là ứng dụng độc lập do ALMEO DEV TEAM phát triển, không phải sản phẩm của cơ quan nhà nước, KHÔNG đại diện cho bất kỳ cơ quan nhà nước nào và không liên kết với cơ quan nào. Nguồn văn bản chính thức kèm đường link: Cài đặt › Trợ giúp & pháp lý › Tài liệu & nguồn chính thức. Liên hệ: thaihoa.89qb@gmail.com"], "privacy": ["Chính sách quyền riêng tư", "Bản tóm tắt. Bản đầy đủ: https://thaihoa89qb-del.github.io/qcvn10-data/privacy.html\n\n1. Dữ liệu bạn nhập (dự án, lịch sử tra cứu, bóc khối lượng, thoát nạn, đánh dấu, cài đặt) chỉ lưu trong bộ nhớ riêng của app trên máy này, không gửi lên máy chủ. Gỡ app là xoá hết.\n\n2. Khi đăng nhập Google, app nhận email, tên hiển thị và mã tài khoản để giữ lượt dùng thử, lượt nhận từ quảng cáo và gói thuê bao. Các trạng thái này lưu trên Google Firebase. App không nhận mật khẩu Google.\n\n3. Mua gói qua Google Play Billing; app chỉ nhận trạng thái giao dịch, không nhận thông tin thẻ.\n\n4. Bản miễn phí có quảng cáo Google AdMob. AdMob có thể dùng mã nhận dạng quảng cáo, thông tin thiết bị và vị trí gần đúng theo địa chỉ mạng.\n\n5. Firebase Crashlytics ghi nhật ký lỗi; Google Analytics thống kê việc dùng tính năng, gắn với một mã cài đặt ứng dụng (dữ liệu bí danh, không gắn email hay tên), không kèm nội dung bạn nhập.\n\n6. Xoá tài khoản: Cài đặt › Tài khoản › Đăng xuất · Xoá tài khoản. Chức năng Sao lưu chép dữ liệu ra dạng văn bản, bạn tự quyết định gửi đi đâu.\n\nLiên hệ: thaihoa.89qb@gmail.com"], "terms": ["Điều khoản sử dụng & miễn trừ trách nhiệm", "1. Kết quả tra cứu, tính toán trong app chỉ mang tính tham khảo, phục vụ định hướng ban đầu. Trước khi đưa vào hồ sơ, người dùng phải đối chiếu với bản gốc quy chuẩn, tiêu chuẩn còn hiệu lực và chịu trách nhiệm chuyên môn về sản phẩm thiết kế của mình.\n\n2. Các con số thuỷ lực (lưu lượng, cột áp, dung tích bể) là tính toán sơ bộ trên mô hình giả định, chưa có bản vẽ thi công thật; cần kiểm tra lại theo bản vẽ.\n\n3. Nội dung QCVN là văn bản quy phạm pháp luật được phép sử dụng. Nội dung TCVN thuộc bản quyền Bộ Khoa học và Công nghệ; app chỉ trích dẫn để phục vụ tra cứu nội bộ, không thay thế việc mua bản chính thức.\n\n4. Tác giả không chịu trách nhiệm với thiệt hại phát sinh từ việc dùng kết quả của app mà không kiểm tra lại theo văn bản gốc.\n\n5. Văn bản pháp luật thay đổi theo thời gian; kiểm tra ngày hiệu lực trước khi áp dụng."], "sources": ["Tài liệu & nguồn chính thức", "ANOVIA không đại diện cho bất kỳ cơ quan nhà nước nào. Nội dung quy chuẩn, văn bản pháp luật trong app được tóm lược từ các nguồn chính thức dưới đây để tham khảo; luôn đối chiếu bản gốc còn hiệu lực trước khi áp dụng.\n\nLUẬT, NGHỊ ĐỊNH, THÔNG TƯ — CÔNG BÁO CHÍNH PHỦ\n• Luật Phòng cháy, chữa cháy và cứu nạn, cứu hộ số 55/2024/QH15: https://congbao.chinhphu.vn/van-ban/luat-so-55-2024-qh15-43594.htm\n• Nghị định 105/2025/NĐ-CP — Phụ lục III (diện thẩm định), Phụ lục VI (bảo hiểm cháy nổ bắt buộc): https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-105-2025-nd-cp-44912.htm\n• Thông tư 36/2025/TT-BCA: https://congbao.chinhphu.vn/van-ban/thong-tu-so-36-2025-tt-bca-44981/56506.htm\n• Thông tư 70/2025/TT-BTC — Phí thẩm định phê duyệt thiết kế PCCC: https://congbao.chinhphu.vn/van-ban/thong-tu-so-70-2025-tt-btc-45422/57423.htm\n• Thông tư 64/2025/TT-BTC — Thu 50% phí thẩm định PCCC đến hết 31/12/2026 (dòng 12): https://vanban.chinhphu.vn/?pageid=27160&docid=214418\n\nQUY CHUẨN KỸ THUẬT QUỐC GIA\n• QCVN 10:2025/BCA — Trang bị, bố trí phương tiện PCCC và CNCH (Thông tư 103/2025/TT-BCA): https://congbao.chinhphu.vn/van-ban/thong-tu-so-103-2025-tt-bca-46574.htm\n• QCVN 06:2022/BXD — An toàn cháy cho nhà và công trình (Thông tư 06/2022/TT-BXD): https://congbao.chinhphu.vn/van-ban/thong-tu-so-06-2022-tt-bxd-38322.htm\n• Sửa đổi 1:2023 QCVN 06:2022/BXD (Thông tư 09/2023/TT-BXD): https://congbao.chinhphu.vn/van-ban/thong-tu-so-09-2023-tt-bxd-40285.htm\n• QCVN 13:2018/BXD — Gara ô tô (Thông tư 12/2018/TT-BXD): https://congbao.chinhphu.vn/van-ban/thong-tu-so-12-2018-tt-bxd-28347.htm\n\nTIÊU CHUẨN QUỐC GIA — TRA TẠI VIỆN TIÊU CHUẨN CHẤT LƯỢNG VIỆT NAM\n• TCVN 7336:2021 — Chữa cháy tự động bằng nước, bọt: https://tieuchuan.vsqi.gov.vn/tim-kiem\n• TCVN 7568-14:2025 — Thiết kế, lắp đặt hệ thống báo cháy: https://tieuchuan.vsqi.gov.vn/tim-kiem\n• TCVN 13456:2022 — Chiếu sáng sự cố và chỉ dẫn thoát nạn: https://tieuchuan.vsqi.gov.vn/tim-kiem\n• TCVN 5687:2024 — Thông gió, điều hoà không khí: https://tieuchuan.vsqi.gov.vn/tim-kiem\n• TCVN 7435-1 — Bình chữa cháy xách tay: https://tieuchuan.vsqi.gov.vn/tim-kiem\n\nHƯỚNG DẪN NGHIỆP VỤ\n• Công văn 3038/C07-P3,P4 ngày 28/8/2026 của Cục Cảnh sát PCCC và CNCH — Phụ lục II Nội dung nghiệm thu PCCC của chủ đầu tư (tin trên Cổng thông tin điện tử Công an tỉnh Gia Lai): https://congan.gialai.gov.vn/vi/news/trien-khai-cong-tac/huong-dan-chu-dau-tu-chu-so-huu-cong-trinh-tu-to-chuc-nghiem-thu-ve-pccc-doi-voi-du-an-cong-trinh-thuoc-dien-tham-dinh-tham-duyet-thiet-ke-ve-ve-pccc-theo-quy-dinh-tai-nghi-quyet-so-66-18-2026-nq-cp-ngay-18-5-2026-cua-chinh-phu-14672.html\n\nCác văn bản khác được dẫn chiếu trong nội dung tra cứu (ví dụ QCVN 01:2019/BCA, QCVN 02:2020/BCA, Nghị định 207/2026/NĐ-CP) tra tại Công báo Chính phủ: https://congbao.chinhphu.vn"]};
+var ANV_LEGAL={"about": ["Về ứng dụng", "ANOVIA · Sổ tay phòng cháy — công cụ tra cứu, tính toán sơ bộ và quản lý hồ sơ thiết kế PCCC cho kỹ sư. Phiên bản 3.0.2. Phần tra cứu chạy ngay trong máy, không cần mạng; chế độ Chuyên gia cần đăng nhập (tài khoản Google, hoặc email và mật khẩu) và có mạng để xác nhận lượt hoặc gói. Phát triển phục vụ công việc thiết kế, thẩm định thiết kế PCCC tại Việt Nam.\n\nANOVIA là ứng dụng độc lập do ALMEO DEV TEAM phát triển, không phải sản phẩm của cơ quan nhà nước, KHÔNG đại diện cho bất kỳ cơ quan nhà nước nào và không liên kết với cơ quan nào. Nguồn văn bản chính thức kèm đường link: Cài đặt › Trợ giúp & pháp lý › Tài liệu & nguồn chính thức. Liên hệ: thaihoa.89qb@gmail.com"], "privacy": ["Chính sách quyền riêng tư", "Bản tóm tắt. Bản đầy đủ: https://thaihoa89qb-del.github.io/qcvn10-data/privacy.html\n\n1. Dữ liệu bạn nhập (dự án, lịch sử tra cứu, bóc khối lượng, thoát nạn, đánh dấu, cài đặt) lưu trong bộ nhớ riêng của app trên máy này, không gửi lên máy chủ của tác giả. Gỡ app là xoá hết trên máy.\n\n1b. Nếu bạn BẬT \"Đồng bộ Google Drive\", app lưu bản sao lưu dữ liệu đó vào thư mục ẩn dành riêng cho ANOVIA trong Google Drive của chính bạn (quyền drive.appdata). Chỉ ANOVIA trên máy bạn đọc ghi được; tác giả không xem được. Tắt đồng bộ, hoặc bấm \"Xoá bản sao lưu trên Drive\", hoặc xoá dữ liệu ứng dụng trong Google Drive › Cài đặt › Quản lý ứng dụng bất cứ lúc nào.\n\n2. Khi đăng nhập bằng Google, app nhận email, tên hiển thị và mã tài khoản. Khi đăng nhập bằng email và mật khẩu, Firebase Authentication (Google) giữ email và mật khẩu đã mã hoá; app không lưu mật khẩu, chỉ dùng email đã xác minh và mã tài khoản để giữ lượt dùng thử, lượt nhận từ quảng cáo và gói thuê bao. Các trạng thái này lưu trên Google Firebase. App không nhận mật khẩu Google.\n\n3. Mua gói qua Google Play Billing; app chỉ nhận trạng thái giao dịch, không nhận thông tin thẻ.\n\n4. Bản miễn phí có quảng cáo Google AdMob. AdMob có thể dùng mã nhận dạng quảng cáo, thông tin thiết bị và vị trí gần đúng theo địa chỉ mạng.\n\n5. Firebase Crashlytics ghi nhật ký lỗi; Google Analytics thống kê việc dùng tính năng, gắn với một mã cài đặt ứng dụng (dữ liệu bí danh, không gắn email hay tên), không kèm nội dung bạn nhập.\n\n6. Xoá tài khoản: Cài đặt › Tài khoản › Đăng xuất · Xoá tài khoản. Chức năng Sao lưu chép dữ liệu ra dạng văn bản, bạn tự quyết định gửi đi đâu.\n\nLiên hệ: thaihoa.89qb@gmail.com"], "terms": ["Điều khoản sử dụng & miễn trừ trách nhiệm", "1. Kết quả tra cứu, tính toán trong app chỉ mang tính tham khảo, phục vụ định hướng ban đầu. Trước khi đưa vào hồ sơ, người dùng phải đối chiếu với bản gốc quy chuẩn, tiêu chuẩn còn hiệu lực và chịu trách nhiệm chuyên môn về sản phẩm thiết kế của mình.\n\n2. Các con số thuỷ lực (lưu lượng, cột áp, dung tích bể) là tính toán sơ bộ trên mô hình giả định, chưa có bản vẽ thi công thật; cần kiểm tra lại theo bản vẽ.\n\n3. Nội dung QCVN là văn bản quy phạm pháp luật được phép sử dụng. Nội dung TCVN thuộc bản quyền Bộ Khoa học và Công nghệ; app chỉ trích dẫn để phục vụ tra cứu nội bộ, không thay thế việc mua bản chính thức.\n\n4. Tác giả không chịu trách nhiệm với thiệt hại phát sinh từ việc dùng kết quả của app mà không kiểm tra lại theo văn bản gốc.\n\n5. Văn bản pháp luật thay đổi theo thời gian; kiểm tra ngày hiệu lực trước khi áp dụng."], "sources": ["Tài liệu & nguồn chính thức", "ANOVIA không đại diện cho bất kỳ cơ quan nhà nước nào. Nội dung quy chuẩn, văn bản pháp luật trong app được tóm lược từ các nguồn chính thức dưới đây để tham khảo; luôn đối chiếu bản gốc còn hiệu lực trước khi áp dụng.\n\nLUẬT, NGHỊ ĐỊNH, THÔNG TƯ — CÔNG BÁO CHÍNH PHỦ\n• Luật Phòng cháy, chữa cháy và cứu nạn, cứu hộ số 55/2024/QH15: https://congbao.chinhphu.vn/van-ban/luat-so-55-2024-qh15-43594.htm\n• Nghị định 105/2025/NĐ-CP — Phụ lục III (diện thẩm định), Phụ lục VI (bảo hiểm cháy nổ bắt buộc): https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-105-2025-nd-cp-44912.htm\n• Thông tư 36/2025/TT-BCA: https://congbao.chinhphu.vn/van-ban/thong-tu-so-36-2025-tt-bca-44981/56506.htm\n• Thông tư 70/2025/TT-BTC — Phí thẩm định phê duyệt thiết kế PCCC: https://congbao.chinhphu.vn/van-ban/thong-tu-so-70-2025-tt-btc-45422/57423.htm\n• Thông tư 64/2025/TT-BTC — Thu 50% phí thẩm định PCCC đến hết 31/12/2026 (dòng 12): https://vanban.chinhphu.vn/?pageid=27160&docid=214418\n\nQUY CHUẨN KỸ THUẬT QUỐC GIA\n• QCVN 10:2025/BCA — Trang bị, bố trí phương tiện PCCC và CNCH (Thông tư 103/2025/TT-BCA): https://congbao.chinhphu.vn/van-ban/thong-tu-so-103-2025-tt-bca-46574.htm\n• QCVN 06:2022/BXD — An toàn cháy cho nhà và công trình (Thông tư 06/2022/TT-BXD): https://congbao.chinhphu.vn/van-ban/thong-tu-so-06-2022-tt-bxd-38322.htm\n• Sửa đổi 1:2023 QCVN 06:2022/BXD (Thông tư 09/2023/TT-BXD): https://congbao.chinhphu.vn/van-ban/thong-tu-so-09-2023-tt-bxd-40285.htm\n• QCVN 13:2018/BXD — Gara ô tô (Thông tư 12/2018/TT-BXD): https://congbao.chinhphu.vn/van-ban/thong-tu-so-12-2018-tt-bxd-28347.htm\n\nTIÊU CHUẨN QUỐC GIA — TRA TẠI VIỆN TIÊU CHUẨN CHẤT LƯỢNG VIỆT NAM\n• TCVN 7336:2021 — Chữa cháy tự động bằng nước, bọt: https://tieuchuan.vsqi.gov.vn/tim-kiem\n• TCVN 7568-14:2025 — Thiết kế, lắp đặt hệ thống báo cháy: https://tieuchuan.vsqi.gov.vn/tim-kiem\n• TCVN 13456:2022 — Chiếu sáng sự cố và chỉ dẫn thoát nạn: https://tieuchuan.vsqi.gov.vn/tim-kiem\n• TCVN 5687:2024 — Thông gió, điều hoà không khí: https://tieuchuan.vsqi.gov.vn/tim-kiem\n• TCVN 7435-1 — Bình chữa cháy xách tay: https://tieuchuan.vsqi.gov.vn/tim-kiem\n\nHƯỚNG DẪN NGHIỆP VỤ\n• Công văn 3038/C07-P3,P4 ngày 28/8/2026 của Cục Cảnh sát PCCC và CNCH — Phụ lục II Nội dung nghiệm thu PCCC của chủ đầu tư (tin trên Cổng thông tin điện tử Công an tỉnh Gia Lai): https://congan.gialai.gov.vn/vi/news/trien-khai-cong-tac/huong-dan-chu-dau-tu-chu-so-huu-cong-trinh-tu-to-chuc-nghiem-thu-ve-pccc-doi-voi-du-an-cong-trinh-thuoc-dien-tham-dinh-tham-duyet-thiet-ke-ve-ve-pccc-theo-quy-dinh-tai-nghi-quyet-so-66-18-2026-nq-cp-ngay-18-5-2026-cua-chinh-phu-14672.html\n\nCác văn bản khác được dẫn chiếu trong nội dung tra cứu (ví dụ QCVN 01:2019/BCA, QCVN 02:2020/BCA, Nghị định 207/2026/NĐ-CP) tra tại Công báo Chính phủ: https://congbao.chinhphu.vn"]};
 /* ===== SAO LƯU TOÀN BỘ DỮ LIỆU (16/09/2026) =====
    Trước đây "Sao lưu hồ sơ dự án" chỉ chép anv_pm_v2 (tab Quản lý): bóc khối lượng, thoát nạn, cấu trúc nhà,
    hỗn hợp, thông tin PDF, lịch sử, đánh dấu đều không có trong bản sao lưu.
@@ -14162,9 +14176,10 @@ window._expertGateHTML=function(){
   }
   if(HAS && a.signedIn===false){
     h+="<div style='font-size:16px;font-weight:800;color:var(--ink);margin-bottom:6px'>Chế độ Chuyên gia</div>"
-      +"<div style='font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:13px'>Đăng nhập bằng tài khoản Google để nhận "
+      +"<div style='font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:13px'>"+(EMAIL()?"Đăng nhập bằng Google hoặc email để nhận ":"Đăng nhập bằng tài khoản Google để nhận ")
       +"<b>10 lượt dùng thử</b>. Lượt và gói gắn với tài khoản, cài lại máy không mất.</div>"
-      +"<div data-anvb='signIn' style='cursor:pointer;text-align:center;padding:13px;border-radius:12px;background:var(--brand);color:#fff;font-weight:700;font-size:15px'>Đăng nhập Google</div>";
+      +"<div data-anvb='signIn' style='cursor:pointer;text-align:center;padding:13px;border-radius:12px;background:var(--brand);color:#fff;font-weight:700;font-size:15px'>Đăng nhập Google</div>"
+      +mailLinkHTML("display:block;text-align:center;margin-top:10px;padding:11px;border-radius:12px;background:var(--field);color:var(--ink);font-weight:600;font-size:14px");
   } else {
     var ap=adProgress();
     h+="<div style='font-size:16px;font-weight:800;color:var(--ink);margin-bottom:6px'>Hết lượt Chuyên gia</div>"
@@ -14286,8 +14301,9 @@ function lockCardHTML(tool, key){
   if(pend){
     h+=p+"Đang xác nhận lượt…</div><div data-anvb='retry' style='"+grey+"'>Thử lại</div>";
   } else if(needSignIn()){
-    h+=p+"Số liệu đã nhập được giữ nguyên. Đăng nhập Google để nhận <b>10 lượt dùng thử</b>.</div>"
-      +"<div data-anvb='signIn' style='"+red+"'>Đăng nhập Google</div>";
+    h+=p+"Số liệu đã nhập được giữ nguyên. Đăng nhập để nhận <b>10 lượt dùng thử</b>.</div>"
+      +"<div data-anvb='signIn' style='"+red+"'>Đăng nhập Google</div>"
+      +mailLinkHTML("display:block;margin-top:10px;font-size:14px;font-weight:600;color:var(--brand)");
   } else if(ANVB.denied[key] && (ANVB.lastReason==='network' || ANVB.lastReason==='error')){
     h+=p+"Không kết nối được để xác nhận lượt. Kiểm tra mạng rồi thử lại.</div>"
       +"<div data-anvb='unlock' data-key='"+esc(key)+"' data-tool='"+tool+"' style='"+red+"'>Thử lại</div>";
@@ -14455,14 +14471,22 @@ function expertActive(){
 }
 
 var adsOn=null;   // trạng thái đã báo cho native, để không gọi lại thừa
+/* VIP/CÓ GÓI KHÔNG ĐƯỢC THẤY QUẢNG CÁO (17/09/2026): mở app native chưa đọc xong Firestore thì getAccountInfo trả vip=false,
+   total=-1. Coi như tài khoản thường là bật banner cho cả VIP. Chưa rõ thì chưa bật. */
+function accUnknown(){ var a=ANVB.acc; return !!(a && a.signedIn && !a.vip && !a.subActive && !(Number(a.total)>=0)); }
 function syncAds(){
   if(!HAS || typeof B.setAdsEnabled!=='function') return;
-  var on = !unlimited() && !expertActive();
+  /* QUẢNG CÁO NGƯỜI DÙNG THƯỜNG (17/09/2026), Anh chốt): chế độ Chuyên gia TẮT toàn bộ quảng cáo;
+     chế độ Cơ bản của người dùng thường banner LUÔN bật. */
+  var on = !unlimited() && !expertActive() && !accUnknown();
   if(on===adsOn) return;
   adsOn=on;
   nb(function(){ B.setAdsEnabled(on); });
 }
 ANVB.syncAds=syncAds;
+
+/* QUẢNG CÁO XEN KẼ CHỈ TRƯỚC KẾT QUẢ (17/09/2026): Anh bỏ loại "thỉnh thoảng" (đổi tab, đóng công cụ) — hiện bất chợt,
+   dễ bấm nhầm. Xen kẽ chỉ còn một chỗ: lúc VÀO màn Kết quả chế độ Cơ bản (xem bọc anvRenderM3, mục 9). */
 
 /* ===== DẤU PRO Ở TRANG CHỦ (16/09/2026) =====
    Dấu PRO gắn vào góc các ô mở công cụ Chuyên gia. Có gói hoặc tài khoản ưu tiên thì bỏ dấu.
@@ -14551,6 +14575,7 @@ window.__accountChanged=function(){
   /* Đăng xuất hoặc đổi tài khoản: quên các khoá đã mở trong phiên. */
   if(!a.signedIn || (prevEmail && a.email!==prevEmail)){ ANVB.unlock={}; ANVB.denied={}; }
   syncCore();
+  syncAds();   /* biết là VIP / có gói ngay sau khi native làm mới → tắt banner luôn */
   renderAcct(); renderHome();
   /* Vừa đăng nhập từ thẻ cổng dạng lớp phủ → chạy tiếp việc đang chờ. */
   try{
@@ -14604,6 +14629,11 @@ function acctHTML(){
     h+="<div data-anvb='signIn'"+(busy?" aria-busy='true'":"")+" style='cursor:pointer;display:flex;align-items:center;gap:11px;padding:12px 13px;'>"
       +"<div style='flex:1'><div style='font-size:15px;font-weight:600;color:var(--ink)'>Đăng nhập Google</div>"
       +"<div style='font-size:13px;color:var(--ink3);margin-top:2px'>"+(busy?"Đang mở hộp chọn tài khoản…":"Nhận 10 lượt Chuyên gia, giữ lượt và gói khi đổi máy")+"</div></div></div>";
+    if(EMAIL()){
+      h+="<div data-anvb='emailOpen' style='cursor:pointer;display:flex;align-items:center;gap:11px;padding:12px 13px;border-top:1px solid var(--line);'>"
+        +"<div style='flex:1;min-width:0'><div style='font-size:15px;font-weight:600;color:var(--ink)'>"+(a.pendingVerify?"Chờ xác minh email":"Đăng nhập bằng email")+"</div>"
+        +"<div style='font-size:13px;color:var(--ink3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+(a.pendingVerify?esc(a.pendingEmail||'')+" · bấm để xác nhận":"Dùng khi máy không đăng nhập Google được")+"</div></div></div>";
+    }
     return h+"</div>";
   }
 
@@ -14654,7 +14684,7 @@ function acctHTML(){
   if(canDel){
     h+="<div data-anvb='delAcc' style='"+ROW+"'>"
       +"<div style='flex:1'><div style='font-size:15px;font-weight:600;color:var(--brand)'>Xoá tài khoản</div>"
-      +"<div style='font-size:13px;color:var(--ink3);margin-top:2px'>Xoá hồ sơ trong ứng dụng này, không xoá tài khoản Google</div></div></div>";
+      +"<div style='font-size:13px;color:var(--ink3);margin-top:2px'>Xoá hồ sơ trong ứng dụng này, "+(a.provider==='password'?"không xoá hộp thư email của Anh":"không xoá tài khoản Google")+"</div></div></div>";
   }
   h+="</details>";
   return h+"</div>";
@@ -14672,8 +14702,243 @@ function renderAcct(){
     anchor.parentNode.insertBefore(box, anchor);
   }
   box.innerHTML=acctHTML();
+  try{ renderDrive(); }catch(e){}
 }
 ANVB.renderAcct=renderAcct;
+
+/* ===== ĐĂNG NHẬP BẰNG EMAIL + MẬT KHẨU (17/09/2026) =====
+   Cho người không đăng nhập Google được. Vỏ native làm hết phần Firebase Auth (AuthManager.kt).
+   - Tạo tài khoản → Firebase gửi thư xác minh. CHƯA bấm link trong thư thì native vẫn báo signedIn=false
+     (pendingVerify=true): không lượt, không gói. Rules Firestore cũng chặn.
+   - Native báo tiến trình qua window.__emailAuthState(state, msg, email):
+       busy · verify · info · error · ok · idle
+   - Mật khẩu chỉ đọc từ ô nhập ngay lúc bấm và chuyển thẳng sang native; không lưu vào ANVB/localStorage.
+   - Lớp phủ có class anv-ovl, đóng là GỠ KHỎI DOM (bẫy Back chết 07/09). Chèn ĐẦU <body> để
+     closeTopSheet() của lõi (querySelector('.anv-ovl') lấy phần tử đầu tiên) đóng bảng này trước thẻ cổng
+     nằm bên dưới. */
+function EMAIL(){ return HAS && typeof B.emailSignIn==='function'; }
+ANVB.mail={mode:'in', msg:'', kind:'', email:'', busyAt:0};
+var MAIL_BUSY_MS=30000;
+function mailBusy(){ return ANVB.mail.busyAt>0 && (Date.now()-ANVB.mail.busyAt)<MAIL_BUSY_MS; }
+
+function mailLinkHTML(style){
+  if(!EMAIL()) return '';
+  var a=ANVB.acc||{};
+  return "<div data-anvb='emailOpen' style='cursor:pointer;"+style+"'>"+(a.pendingVerify?"Chờ xác minh email · bấm để xác nhận":"Đăng nhập bằng email")+"</div>";
+}
+
+function mailSheet(mode){
+  var M=ANVB.mail, a=ANVB.acc||{};
+  if(mode) M.mode=mode;
+  if(a.pendingVerify && M.mode!=='verify'){ M.mode='verify'; if(!M.email) M.email=a.pendingEmail||''; }
+  var id='anvbMailOv', ov=document.getElementById(id);
+  if(!ov){
+    ov=document.createElement('div'); ov.id=id; ov.className='anv-ovl';
+    ov.style.cssText='position:fixed;inset:0;z-index:99990;background:var(--pg);display:flex;flex-direction:column;overflow-y:auto;padding:16px;';
+    ov.addEventListener('click',function(e){ if(e.target===ov) closeMail(); });
+    ov.addEventListener('keydown',function(e){
+      if(e.key!=='Enter') return;
+      var t=e.target; if(!t || t.tagName!=='INPUT') return;
+      e.preventDefault();
+      var btn=ov.querySelector('[data-mailmain]'); if(btn) btn.click();
+    });
+    document.body.insertBefore(ov, document.body.firstChild);
+  }
+  renderMail();
+}
+ANVB.mailSheet=mailSheet;
+
+function closeMail(){
+  var ov=document.getElementById('anvbMailOv');
+  if(ov && ov.parentNode) ov.parentNode.removeChild(ov);
+  ANVB.mail.msg=''; ANVB.mail.kind='';
+}
+ANVB.closeMail=closeMail;
+
+function renderMail(){
+  var ov=document.getElementById('anvbMailOv'); if(!ov) return;
+  var M=ANVB.mail, busy=mailBusy();
+  /* giữ chữ đang gõ khi vẽ lại (báo lỗi, đổi trạng thái bận) */
+  var keep={};
+  ['anvbMailE','anvbMailP','anvbMailP2'].forEach(function(k){ var el=document.getElementById(k); if(el) keep[k]=el.value; });
+  var showPw=!!(document.getElementById('anvbMailShow') && document.getElementById('anvbMailShow').checked);
+  if(keep.anvbMailE!=null) M.email=keep.anvbMailE;
+
+  var TITLE={'in':'Đăng nhập bằng email','up':'Tạo tài khoản bằng email','forgot':'Quên mật khẩu','verify':'Xác minh email'};
+  var IN="width:100%;box-sizing:border-box;padding:12px 13px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:16px;margin-top:6px;";
+  var LB="display:block;font-size:13px;font-weight:600;color:var(--ink2);margin-top:12px;";
+  var MAIN="cursor:pointer;text-align:center;padding:13px;border-radius:12px;background:var(--brand);color:#fff;font-weight:700;font-size:15px;margin-top:16px;"+(busy?"opacity:.55;":"");
+  var SEC="cursor:pointer;text-align:center;padding:12px;border-radius:12px;background:var(--field);color:var(--ink);font-weight:600;font-size:14px;margin-top:9px;"+(busy?"opacity:.55;":"");
+  var LNK="cursor:pointer;display:inline-block;margin-top:14px;font-size:14px;font-weight:600;color:var(--brand);";
+  var pwType=showPw?'text':'password';
+
+  var h="<div style='display:flex;align-items:center;gap:10px;margin-bottom:6px'>"
+    +"<div data-anvb='mailClose' style='cursor:pointer;font-size:22px;line-height:1;color:var(--ink2);padding:4px 8px'>‹</div>"
+    +"<div style='flex:1;font-size:16px;font-weight:700;color:var(--ink)'>"+TITLE[M.mode]+"</div></div>"
+    +"<div style='background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px'>";
+
+  if(M.mode==='verify'){
+    h+="<div style='font-size:14px;color:var(--ink);line-height:1.65'>"+esc(M.msg||("Đã gửi thư xác minh tới "+(M.email||'email của Anh')+". Mở thư (xem cả mục Spam, Quảng cáo), bấm đường link trong thư, rồi quay lại bấm \"Tôi đã xác minh\"."))+"</div>"
+      +"<div data-anvb='mailCheck' data-mailmain='1' style='"+MAIN+"'>"+(busy?"Đang kiểm tra…":"Tôi đã xác minh")+"</div>"
+      +"<div data-anvb='mailResend' style='"+SEC+"'>Gửi lại thư xác minh</div>"
+      +"<div data-anvb='mailCancel' style='"+SEC+"'>Dùng email khác</div>"
+      +"<div style='font-size:12px;color:var(--ink3);margin-top:12px;line-height:1.55'>Chưa xác minh thì chưa nhận được 10 lượt dùng thử. Thư thường tới trong 1–2 phút.</div>";
+  } else {
+    h+="<label style='"+LB+"margin-top:0' for='anvbMailE'>Email</label>"
+      +"<input id='anvbMailE' type='email' inputmode='email' autocomplete='email' autocapitalize='off' spellcheck='false' style='"+IN+"' value='"+esc(M.email||'').replace(/'/g,'&#39;')+"'>";
+    if(M.mode!=='forgot'){
+      h+="<label style='"+LB+"' for='anvbMailP'>Mật khẩu</label>"
+        +"<input id='anvbMailP' type='"+pwType+"' autocomplete='"+(M.mode==='up'?'new-password':'current-password')+"' style='"+IN+"'>";
+      if(M.mode==='up'){
+        h+="<label style='"+LB+"' for='anvbMailP2'>Nhập lại mật khẩu</label>"
+          +"<input id='anvbMailP2' type='"+pwType+"' autocomplete='new-password' style='"+IN+"'>";
+      }
+      h+="<label style='display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--ink2)'><input id='anvbMailShow' type='checkbox'"+(showPw?" checked":"")+"> Hiện mật khẩu</label>";
+    }
+    if(M.mode==='in') h+="<div data-anvb='mailIn' data-mailmain='1' style='"+MAIN+"'>"+(busy?"Đang đăng nhập…":"Đăng nhập")+"</div>";
+    if(M.mode==='up') h+="<div style='font-size:12px;color:var(--ink3);margin-top:10px;line-height:1.55'>Mật khẩu ít nhất 8 ký tự. Tạo xong, ứng dụng gửi thư xác minh; bấm đường link trong thư mới nhận 10 lượt dùng thử.</div>"
+      +"<div data-anvb='mailUp' data-mailmain='1' style='"+MAIN+"'>"+(busy?"Đang tạo…":"Tạo tài khoản")+"</div>";
+    if(M.mode==='forgot') h+="<div style='font-size:13px;color:var(--ink2);margin-top:10px;line-height:1.55'>Nhập email đã dùng để tạo tài khoản. Ứng dụng gửi thư có đường link đặt mật khẩu mới.</div>"
+      +"<div data-anvb='mailReset' data-mailmain='1' style='"+MAIN+"'>"+(busy?"Đang gửi…":"Gửi thư đặt lại mật khẩu")+"</div>";
+  }
+  if(M.msg && M.mode!=='verify'){
+    var err=(M.kind==='error');
+    h+="<div id='anvbMailMsg' style='margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.55;"
+      +(err?"background:#fbe7e0;color:#9b2c1a;":"background:var(--field);color:var(--ink);")+"'>"+esc(M.msg)+"</div>";
+  } else if(M.msg && M.mode==='verify' && M.kind==='error'){
+    h+="<div id='anvbMailMsg' style='margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.55;background:#fbe7e0;color:#9b2c1a;'>"+esc(M.msg)+"</div>";
+  }
+  if(M.mode==='in'){
+    h+="<div><span data-anvb='mailMode' data-m='forgot' style='"+LNK+"'>Quên mật khẩu?</span></div>"
+      +"<div><span data-anvb='mailMode' data-m='up' style='"+LNK+"margin-top:6px'>Chưa có tài khoản? Tạo tài khoản</span></div>";
+  } else if(M.mode==='up' || M.mode==='forgot'){
+    h+="<div><span data-anvb='mailMode' data-m='in' style='"+LNK+"'>‹ Quay lại đăng nhập</span></div>";
+  }
+  h+="</div>";
+  if(M.mode!=='verify') h+="<div style='font-size:12px;color:var(--ink3);margin:12px 4px 0;line-height:1.55'>Máy đăng nhập Google được thì nên dùng nút Google. Email + mật khẩu dành cho máy không có hoặc lỗi tài khoản Google. Lượt và gói gắn theo tài khoản, dùng trên tối đa 2 máy.</div>";
+
+  ov.innerHTML=h;
+  ['anvbMailP','anvbMailP2'].forEach(function(k){ var el=document.getElementById(k); if(el && keep[k]!=null) el.value=keep[k]; });
+}
+
+function mailVal(id){ var el=document.getElementById(id); return el?String(el.value||''):''; }
+function mailSay(kind,msg){ ANVB.mail.kind=kind; ANVB.mail.msg=msg; renderMail(); }
+
+function mailAction(k, el){
+  var M=ANVB.mail;
+  if(k==='mailClose'){ closeMail(); return; }
+  if(k==='mailMode'){ M.email=mailVal('anvbMailE')||M.email; M.msg=''; M.kind=''; M.mode=el.getAttribute('data-m')||'in'; renderMail(); return; }
+  if(mailBusy()) return;
+  if(k==='mailCancel'){ M.mode='in'; M.msg=''; nb(function(){ B.emailCancel(); }); renderMail(); return; }
+  var email=mailVal('anvbMailE').trim();
+  if(k==='mailIn' || k==='mailUp' || k==='mailReset'){
+    M.email=email;
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ mailSay('error','Nhập đúng địa chỉ email'); return; }
+  }
+  if(k==='mailIn'){
+    var pw=mailVal('anvbMailP');
+    if(!pw){ mailSay('error','Nhập mật khẩu'); return; }
+    M.busyAt=Date.now(); renderMail();
+    nb(function(){ B.emailSignIn(email, pw); }); return;
+  }
+  if(k==='mailUp'){
+    var p1=mailVal('anvbMailP'), p2=mailVal('anvbMailP2');
+    if(p1.length<8){ mailSay('error','Mật khẩu cần ít nhất 8 ký tự'); return; }
+    if(p1!==p2){ mailSay('error','Hai lần nhập mật khẩu không khớp'); return; }
+    M.busyAt=Date.now(); renderMail();
+    nb(function(){ B.emailSignUp(email, p1); }); return;
+  }
+  if(k==='mailReset'){ M.busyAt=Date.now(); renderMail(); nb(function(){ B.emailReset(email); }); return; }
+  if(k==='mailCheck'){ M.busyAt=Date.now(); M.kind=''; renderMail(); nb(function(){ B.emailCheck(); }); return; }
+  if(k==='mailResend'){ M.busyAt=Date.now(); M.kind=''; renderMail(); nb(function(){ B.emailResend(); }); return; }
+}
+
+/* Native báo kết quả. Bảng đã đóng mà native báo 'verify' (vd. đăng nhập email chưa xác minh) thì mở lại. */
+window.__emailAuthState=function(state, msg, email){
+  var M=ANVB.mail;
+  if(state==='busy'){ if(!M.busyAt) M.busyAt=Date.now(); renderMail(); return; }
+  M.busyAt=0;
+  if(state==='ok'){
+    closeMail(); M.mode='in'; M.msg=''; M.kind='';
+    toast('Đã đăng nhập');
+    return;
+  }
+  if(state==='verify'){
+    M.mode='verify'; M.kind=''; M.msg=msg||''; if(email) M.email=email;
+    readAcc(); renderAcct();
+    if(!document.getElementById('anvbMailOv')) mailSheet('verify'); else renderMail();
+    return;
+  }
+  if(state==='idle'){ M.mode='in'; M.msg=''; M.kind=''; readAcc(); renderAcct(); renderMail(); return; }
+  if(state==='info'){
+    M.kind='info'; M.msg=msg||'';
+    if(M.mode==='forgot') M.mode='in';
+    renderMail(); return;
+  }
+  M.kind='error'; M.msg=msg||'Chưa thực hiện được, thử lại sau ít phút';
+  if(!document.getElementById('anvbMailOv')){ toast(M.msg); return; }
+  renderMail();
+};
+
+/* ===== ĐỒNG BỘ GOOGLE DRIVE (17/09/2026) =====
+   Dữ liệu (bản sao lưu ANOVIA-BK-V2) lưu trong thư mục ẩn dành riêng cho ANOVIA trên Google Drive CỦA NGƯỜI DÙNG.
+   Native (DriveSync.kt) lo quyền, tải lên khi rời app, hỏi nạp khi máy khác có bản mới hơn.
+   Bundle chỉ vẽ khối trong Cài đặt và gọi AndroidBridge.driveAction(on|off|now|restore|wipe). */
+function DRIVE(){ return HAS && typeof B.driveStatus==='function' && typeof B.driveAction==='function'; }
+function driveSt(){ if(!DRIVE()) return null; return nb(function(){ return JSON.parse(B.driveStatus()||'{}'); }); }
+function driveWhen(ms){
+  if(!ms) return 'chưa có';
+  var d=new Date(ms), z=function(n){return (n<10?'0':'')+n;};
+  var same=d.toDateString()===new Date().toDateString();
+  return z(d.getHours())+':'+z(d.getMinutes())+(same?' hôm nay':(' '+z(d.getDate())+'/'+z(d.getMonth()+1)+'/'+d.getFullYear()));
+}
+function driveHTML(){
+  var s=driveSt(); if(!s) return '';
+  var a=ANVB.acc||{};
+  var ROW="cursor:pointer;display:flex;align-items:center;gap:11px;padding:12px 14px;border-top:1px solid var(--line);";
+  var CHEV="<svg class='isv i16 chev' style='stroke-width:2.2;'><use href='#i-chr'></use></svg>";
+  var h="<div class='setlbl' style='margin-top:14px'>Đồng bộ dữ liệu</div><div style='background:var(--card);border-radius:12px;overflow:hidden;'>";
+  var head=function(t,sub,act){
+    return "<div"+(act?" data-anvb='"+act+"'":"")+" style='"+(act?"cursor:pointer;":"")+"display:flex;align-items:center;gap:11px;padding:12px 14px;'>"
+      +"<div style='flex:1;min-width:0'><div style='font-size:15px;font-weight:600;color:var(--ink)'>"+t+"</div>"
+      +"<div style='font-size:13px;color:var(--ink3);margin-top:2px;line-height:1.5'>"+sub+"</div></div></div>";
+  };
+  if(!s.available) return h+head('Đồng bộ Google Drive','Máy thiếu Dịch vụ Google Play nên chưa dùng được. Dùng Sao lưu toàn bộ dữ liệu ở mục Dữ liệu trên máy.','')+"</div>";
+  if(!a.signedIn) return h+head('Đồng bộ Google Drive','Đăng nhập để bật. Dữ liệu lưu trong Google Drive của chính Anh, máy khác đăng nhập là lấy lại được.','')+"</div>";
+  var busy={up:'Đang sao lưu lên Drive…',down:'Đang tải bản sao lưu…',wipe:'Đang xoá bản sao lưu…',auth:'Đang xin quyền Google Drive…'}[s.busy]||'';
+  if(!(s.enabled && s.ownerMatch)){
+    h+=head('Bật đồng bộ Google Drive',
+      busy||'Tự sao lưu dự án, bóc khối lượng, thoát nạn… vào Google Drive của chính Anh. Chỉ ANOVIA đọc được, tác giả không xem được. Đổi máy, bật đồng bộ là lấy lại.','driveOn');
+    if(s.error) h+="<div style='font-size:12.5px;color:#9b2c1a;padding:0 14px 11px'>"+esc(s.error)+"</div>";
+    return h+"</div>";
+  }
+  var sub=(s.account?esc(s.account)+' · ':'')+'Lần sao lưu gần nhất: '+driveWhen(s.lastUpMs)+(s.lastUpSum?(' · '+esc(s.lastUpSum)):'');
+  h+=head('Đồng bộ Google Drive · Đang bật', busy||sub, '');
+  if(s.error && !busy) h+="<div style='font-size:12.5px;color:#9b2c1a;padding:0 14px 11px'>"+esc(s.error)+"</div>";
+  h+="<details class='ssub'><summary><div class='rmain'><div class='rt'>Tuỳ chọn Google Drive</div><div class='rs'>Sao lưu ngay, khôi phục, tắt đồng bộ</div></div>"+CHEV+"</summary>"
+    +"<div data-anvb='driveNow' style='"+ROW+"'><div style='flex:1'><div style='font-size:15px;font-weight:600;color:var(--ink)'>Sao lưu lên Drive ngay</div><div style='font-size:13px;color:var(--ink3);margin-top:2px'>App cũng tự sao lưu mỗi lần Anh rời app</div></div></div>"
+    +"<div data-anvb='driveRestore' style='"+ROW+"'><div style='flex:1'><div style='font-size:15px;font-weight:600;color:var(--ink)'>Khôi phục từ Drive</div><div style='font-size:13px;color:var(--ink3);margin-top:2px'>Nạp bản mới nhất, gộp với dữ liệu trên máy</div></div></div>"
+    +"<div data-anvb='driveOff' style='"+ROW+"'><div style='flex:1'><div style='font-size:15px;font-weight:600;color:var(--ink)'>Tắt đồng bộ</div><div style='font-size:13px;color:var(--ink3);margin-top:2px'>Bản sao lưu trên Drive vẫn giữ</div></div></div>"
+    +"<div data-anvb='driveWipe' style='"+ROW+"'><div style='flex:1'><div style='font-size:15px;font-weight:600;color:var(--brand)'>Xoá bản sao lưu trên Drive</div><div style='font-size:13px;color:var(--ink3);margin-top:2px'>Xoá hẳn khỏi Google Drive của Anh, dữ liệu trên máy giữ nguyên</div></div></div>"
+    +"</details>";
+  return h+"</div>";
+}
+function renderDrive(){
+  if(!HAS) return;
+  var box=document.getElementById('anvbDrive');
+  if(!DRIVE()){ if(box && box.parentNode) box.parentNode.removeChild(box); return; }
+  var acct=document.getElementById('anvbAcct'); if(!acct || !acct.parentNode) return;
+  if(!box){
+    box=document.createElement('div'); box.id='anvbDrive'; box.style.cssText='padding:0 14px 0;';
+    acct.parentNode.insertBefore(box, acct.nextSibling);
+  }
+  /* Giữ trạng thái mở của nhóm Tuỳ chọn khi vẽ lại */
+  var open=!!box.querySelector('details[open]');
+  box.innerHTML=driveHTML();
+  if(open){ var d=box.querySelector('details'); if(d) d.setAttribute('open',''); }
+}
+ANVB.renderDrive=renderDrive;
+window.__driveState=function(){ renderDrive(); };
 
 /* ===== 6. BẮT SỰ KIỆN ===== */
 document.addEventListener('click',function(ev){
@@ -14727,6 +14992,14 @@ document.addEventListener('click',function(ev){
   }
   if(k==='back2'){ closeGate(); try{ if(window.go) go(2); }catch(e){} return; }
   if(!HAS){ toast('Tính năng này chỉ có trong ứng dụng Android'); return; }
+  if(k.indexOf('drive')===0){
+    if(!DRIVE()) return;
+    var DA={driveOn:'on',driveOff:'off',driveNow:'now',driveRestore:'restore',driveWipe:'wipe'}[k];
+    if(DA){ nb(function(){ B.driveAction(DA); }); setTimeout(renderDrive, 50); }
+    return;
+  }
+  if(k==='emailOpen'){ if(EMAIL()) mailSheet((ANVB.acc&&ANVB.acc.pendingVerify)?'verify':'in'); return; }
+  if(k.indexOf('mail')===0){ if(EMAIL()) mailAction(k, el); return; }
   if(k==='signIn')   {
     if(signBusy()) return;
     ANVB.signAt=Date.now(); renderAcct();
@@ -14739,6 +15012,10 @@ document.addEventListener('click',function(ev){
   if(k==='buyM')     { nb(function(){B.buyMonthly();}); return; }
   if(k==='buyY')     { nb(function(){B.buyYearly();}); return; }
   if(k==='watchAd')  { nb(function(){B.watchAd();}); return; }
+},true);
+document.addEventListener('change',function(ev){
+  var t=ev.target; if(!t || t.id!=='anvbMailShow') return;
+  ['anvbMailP','anvbMailP2'].forEach(function(k){ var el=document.getElementById(k); if(el) el.type=t.checked?'text':'password'; });
 },true);
 
 /* ===== 7. DI TRÚ DỮ LIỆU TỪ BẢN CŨ ===== */
@@ -14821,7 +15098,7 @@ function wrap(){
           var nRes=99; try{ nRes=(parseInt(localStorage.getItem('anvb_m3n_v1'),10)||0)+1; localStorage.setItem('anvb_m3n_v1', String(nRes)); }catch(e){}
           firstRuns = nRes<=3;
         }
-        if(HAS && !firstRuns && !unlimited() && window.st && st.mode!=='expert' && ANVB.lastM3Tab!==3
+        if(HAS && !firstRuns && !unlimited() && !accUnknown() && window.st && st.mode!=='expert' && ANVB.lastM3Tab!==3
            && typeof B.interstitialBeforeResult==='function'){
           nb(function(){ B.interstitialBeforeResult(); });
         }
@@ -15104,5 +15381,495 @@ window.ANVB_PREVIEW={"ten":"Nhà thi đấu, nhà tập luyện thể thao","moT
   })();
   try{ recentRender(); }catch(e){}
 })();
+</script><script>
+/* ===================== NHẬP NHANH (gõ hoặc nói một câu) v1 — 20/09/2026 =====================
+   Anh chốt 20/09: KHÔNG dùng AI, không gọi mạng. Bộ luật chạy trong máy, đẩy OTA được.
+   Giọng nói: dùng nút micro của bàn phím (Laban Key, Gboard) — app không xin quyền ghi âm,
+   không phải khai thêm An toàn dữ liệu.
+
+   Luật Anh chốt:
+    1. Loại công trình: KHÔNG tự chọn, trừ khi chỉ khớp đúng 1 mục. Còn lại đưa 3 mục gần nhất để chạm.
+    2. Đặt ngay đầu màn Chọn công trình (b0), không làm màn riêng.
+    3. Nhận: loại công trình, số tầng, DT 1 tầng / tổng DT, chiều cao tầng, số tầng hầm + DT hầm, chiều cao PCCC.
+    4. Nhớ 10 câu gần nhất.
+    5. Câu mơ hồ ("500m2" trống không) → HỎI LẠI, hai nút chọn. Không đoán bừa.
+
+   Cách hiểu câu: cắt câu thành từng MỆNH ĐỀ theo dấu phẩy / chữ "và", rồi soi từng mệnh đề.
+   Soi cả câu thì "nhà 5 tầng, mỗi tầng 300m2, cao 20m" sẽ hiểu nhầm 20 m là chiều cao 1 tầng
+   (vì cụm "mỗi tầng" nằm ở mệnh đề trước).
+
+   Ba mức tin, thẻ trả lời ghi rõ từng mức:
+     nghe — câu nói thẳng ra ("cao mỗi tầng 4m")
+     đoán — suy từ lối nói thường gặp ("cao 4m" ở câu có số tầng: coi là chiều cao 1 tầng vì ≤ 6 m)
+     suy  — máy tính ra (chiều cao PCCC, DT 1 tầng chia từ tổng)
+   Mức "đoán" và "suy" đều chạm đổi được ngay trên thẻ.
+
+   Câu sau vá câu trước: chỉ đổi thứ câu mới nhắc tới.
+   Test: test/nhapnhanh_test.js — ANVNN.parse() là hàm thuần, kiểm không cần DOM. */
+(function(){
+  var NN = window.ANVNN = {};
+
+  var FH_MAX_DOAN = 6;    /* "cao X m" không nói rõ: X ≤ 6 m coi là chiều cao 1 tầng (mức đoán) */
+
+  /* ---------- chữ, số ---------- */
+  function rd(s){
+    s = String(s==null?'':s).toLowerCase();
+    try{ s = s.normalize('NFD').replace(/[̀-ͯ]/g,''); }catch(e){}
+    return s.replace(/đ/g,'d').replace(/\s+/g,' ');
+  }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  /* "1.500" = một nghìn năm trăm; "3,6" và "3.6" = ba phẩy sáu. */
+  function num(s){
+    s = String(s||'').trim();
+    if(/^\d{1,3}(\.\d{3})+$/.test(s)) return parseFloat(s.replace(/\./g,''));
+    return parseFloat(s.replace(/,/g,'.'));
+  }
+  function fmt(v){
+    if(v==null || isNaN(v)) return '—';
+    return (Math.round(v*100)/100).toString().replace('.', ',');
+  }
+  function has(s, list){ for(var i=0;i<list.length;i++) if(s.indexOf(list[i])>=0) return true; return false; }
+
+  var PER_FLOOR = ['moi tang','1 tang','mot tang','/tang','tren tang','moi san','1 san','mot san','tung tang','dien tich san','san dien hinh','tang dien hinh'];
+  var TOTAL     = ['tong','toan nha','ca toa','ca nha','toan bo','cong trinh co'];
+  var PCCC      = ['pccc','phong chay'];
+  var FH_WORD   = ['moi tang','1 tang','mot tang','/tang','tang cao','cao tang','chieu cao tang','thong thuy','moi san','tung tang'];
+
+  /* ---------- tách câu ---------- */
+  /* Trả {vals, from, asks, typeQ}. vals chỉ có thứ câu này nhắc tới. */
+  NN.parse = function(text){
+    var raw = String(text||'');
+    var t = rd(raw);
+    var vals = {}, from = {}, asks = [], nAsk = 0;
+
+    function set(k, v, how){
+      if(v==null || isNaN(v) || v<0) return;
+      /* "nghe" đè "đoán"; "đoán" không đè "nghe" */
+      if(vals[k]!=null && from[k]==='nghe' && how!=='nghe') return;
+      vals[k] = v; from[k] = how || 'nghe';
+    }
+    function ask(id, v, q, opts){ asks.push({ id:id+(++nAsk), v:v, q:q, opts:opts }); }
+
+    /* Dấu phẩy thập phân ("3,6m") đổi thành dấu chấm TRƯỚC khi cắt mệnh đề,
+       nếu không "3,6m" bị cắt làm đôi và mất luôn chiều cao. */
+    t = t.replace(/(\d)\s*,\s*(\d)/g, '$1.$2');
+    var clauses = t.split(/[,;]|\s+va\s+|\s+roi\s+/);
+
+    clauses.forEach(function(c){
+      c = c.trim(); if(!c) return;
+      var coHam = /ham/.test(c);
+
+      /* --- tầng hầm --- */
+      var mh = /(\d+)\s*(?:tang\s*)?(?:ban\s*)?ham/.exec(c);
+      if(mh) set('bsmt', parseInt(mh[1],10));
+      else if(coHam && !/\d/.test(c) && !/khong/.test(c)) set('bsmt', 1);
+      else if(/khong\s*(?:co\s*)?(?:tang\s*)?ham/.test(c)) set('bsmt', 0);
+
+      /* --- số tầng nổi --- */
+      /* "nhà kho cao 3 tầng" vẫn là 3 tầng; "mỗi tầng 300m2" không có số đứng trước "tầng" nên không dính. */
+      if(!coHam){
+        var mf = /(\d+)\s*tang/.exec(c);
+        if(mf) set('floors', parseInt(mf[1],10));
+      }
+
+      /* --- diện tích --- */
+      var reA = /(\d+(?:[.,]\d+)?)\s*(?:m2|m²|m vuong|met vuong)/g, ma;
+      while((ma = reA.exec(c))){
+        var v = num(ma[1]);
+        if(coHam){ set('faHam', v); continue; }
+        if(has(c, PER_FLOOR)){ set('fa', v); continue; }
+        if(has(c, TOTAL)){ set('_faTotal', v); continue; }
+        if(/\d+\s*tang/.test(c)){ set('fa', v, 'doan'); continue; }   /* "2 tầng 500m2" — lối nói thường là mỗi tầng */
+        ask('area', v, '“'+fmt(v)+' m²” là diện tích MỖI TẦNG hay TỔNG cả công trình?',
+            [{label:'Mỗi tầng', key:'fa'},{label:'Tổng cả công trình', key:'_faTotal'}]);
+      }
+
+      /* --- chiều cao (m, không phải m²) --- */
+      var reH = /(\d+(?:[.,]\d+)?)\s*m(?![²2a-z])/g, mm;
+      while((mm = reH.exec(c))){
+        var vh = num(mm[1]);
+        if(has(c, PCCC)){ set('pccc', vh); continue; }
+        if(has(c, FH_WORD)){ set('fh', vh); continue; }
+        if(!/cao/.test(c)) continue;                       /* số mét không gắn với chữ "cao" thì bỏ qua */
+        if(vh <= FH_MAX_DOAN){ set('fh', vh, 'doan'); continue; }
+        ask('height', vh, '“'+fmt(vh)+' m” là chiều cao MỖI TẦNG hay chiều cao PCCC của cả nhà?',
+            [{label:'Mỗi tầng', key:'fh'},{label:'Chiều cao PCCC', key:'pccc'}]);
+      }
+    });
+
+    /* --- cụm chữ để tìm loại công trình: phần trước con số đầu tiên --- */
+    var typeQ = '';
+    var cut = raw.search(/\d/);
+    var head = (cut>0 ? raw.slice(0, cut) : raw);
+    head = head.split(/[,;.\n]/)[0] || '';
+    head = head.replace(/\s*\b(gồm|gom|có|co|cao|diện tích|dien tich|khoảng|khoang|là|la)\b\s*$/i, '').trim();
+    if(rd(head).replace(/[^a-z0-9]/g,'').length >= 2) typeQ = head;
+
+    return { raw: raw, vals: vals, from: from, asks: asks, typeQ: typeQ };
+  };
+
+  /* ---------- tìm loại công trình ----------
+     Tìm thẳng cả cụm thường trượt: người nói "nhà hàng tiệc cưới", danh mục ghi
+     "Nhà hàng, cửa hàng ăn uống, nhà ăn…" — BRAIN.searchAll đòi MỌI từ phải có mặt.
+     Nên tìm ba nấc: cả cụm → từng cặp từ liền nhau → từng từ, rồi xếp hạng theo
+     số từ khớp, đồng hạng thì tên ngắn hơn (mục chung) lên trước. */
+  var STOP = ['cong','trinh','toa','day','khu','cai','mot','la','cua','va','o','co'];
+  var _all = null;
+  function allBuildings(){
+    if(_all) return _all;
+    var out = [], seen = {};
+    try{
+      (BRAIN.categories()||[]).forEach(function(c){
+        if(BRAIN.isInfraCat && BRAIN.isInfraCat(c.id)) return;      /* hạ tầng kỹ thuật: không nhập kiểu này */
+        (BRAIN.buildingsInCategory(c.id, '')||[]).forEach(function(b){
+          if(seen[b.code]) return;
+          seen[b.code] = 1;
+          out.push({ code:b.code, name:b.name, rd:rd(b.name) });
+        });
+      });
+    }catch(e){ out = []; }
+    if(out.length) _all = out;
+    return out;
+  }
+
+  /* Chấm điểm: cả cụm khớp ăn đứt; hai từ liền nhau đứng cạnh nhau trong tên ăn tiếp;
+     rồi mới tới từng từ lẻ. Tên ngắn hơn (mục chung) thắng khi bằng điểm. */
+  /* Từ quá chung ("nhà", "quán"...) gần như tên nào cũng có → cho điểm thấp, không thì nhiễu. */
+  var WEAK = ['nha','quan','tiem','cua','so','co','khu','trung','tam','loai','kieu'];
+  function scoreName(nrd, qrd, words){
+    var s = 0;
+    if(qrd && nrd.indexOf(qrd) >= 0) s += 100;
+    for(var i=0;i<words.length-1;i++){
+      if(nrd.indexOf(words[i]+' '+words[i+1]) >= 0) s += 12;
+    }
+    words.forEach(function(w){
+      var full = (WEAK.indexOf(w) >= 0) ? 1 : 4;
+      if(new RegExp('(^|[^a-z0-9])'+w+'([^a-z0-9]|$)').test(nrd)) s += full;
+      else if(nrd.indexOf(w) >= 0) s += (full>1 ? 2 : 0);
+    });
+    return s;
+  }
+
+  NN.find = function(q){
+    q = String(q||'').trim(); if(!q) return [];
+    var qrd = rd(q).trim();
+    var words = qrd.split(/[^a-z0-9]+/).filter(function(w){ return w.length>1 && STOP.indexOf(w)<0; });
+    if(!words.length) return [];
+    var list = allBuildings();
+    if(!list.length){
+      try{ return (window.BRAIN && BRAIN.searchAll) ? BRAIN.searchAll(q) : []; }catch(e){ return []; }
+    }
+    var hits = [];
+    list.forEach(function(b){
+      var s = scoreName(b.rd, qrd, words);
+      if(s >= 4) hits.push({ code:b.code, name:b.name, s:s });
+    });
+    hits.sort(function(a,b){
+      if(b.s !== a.s) return b.s - a.s;
+      return String(a.name||'').length - String(b.name||'').length;
+    });
+    /* Bỏ những mục điểm quá thấp so với mục đầu — chúng chỉ trùng một từ chung. */
+    if(hits.length){
+      var top = hits[0].s, san = Math.max(4, top/3);
+      hits = hits.filter(function(x){ return x.s >= san; });
+    }
+    return hits;
+  };
+
+  /* ---------- bản nháp ---------- */
+  NN.draft = null;
+  function blank(){ return { code:null, name:'', vals:{}, from:{}, asks:[], cands:[], typeQ:'', said:'', editing:null }; }
+
+  NN.feed = function(text){
+    var r = NN.parse(text);
+    var d = NN.draft || blank();
+    d.said = String(text||'').trim();
+    d.editing = null;
+    for(var k in r.vals){ if(r.vals.hasOwnProperty(k)){ d.vals[k] = r.vals[k]; d.from[k] = r.from[k]; } }
+    d.asks = r.asks || [];
+    if(r.typeQ){
+      d.typeQ = r.typeQ;
+      var list = NN.find(r.typeQ);
+      d.cands = list.slice(0, 3);
+      /* Chỉ tự chọn khi đúng MỘT mục và mục đó khớp chắc (cả cụm, hoặc hai từ đứng liền nhau).
+         Một mục khớp lỏng — ví dụ "nhà xưởng" chỉ trúng chữ "xưởng" — vẫn phải để Anh chạm chọn. */
+      if(list.length === 1 && list[0].s >= 12){ d.code = list[0].code; d.name = list[0].name; }
+      else if(list.length === 0){ d.code = null; d.name = ''; }
+      else if(!d.code || !list.some(function(x){ return x.code===d.code; })){ d.code = null; d.name = ''; }
+    }
+    NN.derive(d);
+    NN.draft = d;
+    return d;
+  };
+
+  /* Số máy tự tính. Chỉ tính đè lên số mức "suy", không đè số Anh nói. */
+  NN.derive = function(d){
+    var v = d.vals;
+    if(v._faTotal!=null && v.floors>0 && (v.fa==null || d.from.fa==='suy')){
+      var tang = v.floors + (v.bsmt||0);
+      v.fa = Math.round(v._faTotal / (tang>0?tang:v.floors) * 10)/10;
+      d.from.fa = 'suy';
+    }
+    if((v.pccc==null || d.from.pccc==='suy') && v.floors>0 && v.fh>0){
+      v.pccc = Math.round((v.floors-1)*v.fh*10)/10;
+      d.from.pccc = 'suy';
+    }
+    return d;
+  };
+
+  NN.answer = function(askId, key){
+    var d = NN.draft; if(!d) return;
+    for(var i=0;i<d.asks.length;i++){
+      if(d.asks[i].id===askId){
+        d.vals[key] = d.asks[i].v; d.from[key] = 'nghe';
+        d.asks.splice(i,1);
+        break;
+      }
+    }
+    NN.derive(d);
+  };
+
+  /* Đổi chỗ hai số hay lẫn nhau: chiều cao 1 tầng ↔ chiều cao PCCC. */
+  NN.swapHeight = function(){
+    var d = NN.draft; if(!d) return;
+    var v = d.vals;
+    if(v.fh==null) return;
+    v.pccc = v.fh; d.from.pccc = 'nghe';
+    delete v.fh; delete d.from.fh;
+  };
+
+  NN.pick = function(code){
+    var d = NN.draft; if(!d) return;
+    d.code = code;
+    try{ var b = BRAIN.building(code); d.name = b?b.name:''; }catch(e){ d.name=''; }
+  };
+
+  NN.setVal = function(key, v){
+    var d = NN.draft; if(!d) return;
+    if(v==null || v==='' || isNaN(num(v))){ delete d.vals[key]; delete d.from[key]; }
+    else { d.vals[key] = num(v); d.from[key] = 'nghe'; }
+    d.editing = null;
+    NN.derive(d);
+  };
+
+  /* ---------- lịch sử 10 câu ---------- */
+  var HKEY = 'anv_nn_hist_v1';
+  function hist(){ try{ var a = JSON.parse(localStorage.getItem(HKEY)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+  function pushHist(q){
+    q = String(q||'').trim(); if(!q) return;
+    try{
+      var a = hist().filter(function(x){ return x!==q; });
+      a.unshift(q);
+      localStorage.setItem(HKEY, JSON.stringify(a.slice(0,10)));
+    }catch(e){}
+  }
+  NN.hist = hist;
+
+  /* ---------- đổ vào form ---------- */
+  NN.apply = function(){
+    var d = NN.draft;
+    if(!d || !d.code || (d.asks||[]).length) return false;
+    var v = d.vals;
+    try{
+      if(window.st){
+        if(st.buildingCode !== d.code && typeof window.resetInput==='function') resetInput();
+        st.infraId = null;
+        st.buildingCode = d.code;
+        if(v.floors!=null) st.f_floors = String(v.floors);
+        if(v.fa!=null)     st.f_fa     = String(v.fa);
+        if(v.bsmt!=null)   st.f_bsmt   = String(v.bsmt);
+        if(v.faHam!=null)  st.f_faHam  = String(v.faHam);
+        if(v.fh!=null)     st.f_fh     = String(v.fh);
+        if(v.pccc!=null)   st.f_pcccHeight = String(v.pccc);
+        st.cat = false; st.tab = 2;
+      }
+      pushHist(d.said || '');
+      NN.draft = null;
+      try{ if(window.anvRenderM2) anvRenderM2(); }catch(e){}
+      try{ if(window.anvRender) anvRender(); }catch(e){}
+      var inp = document.getElementById('anvNNIn'); if(inp) inp.value = '';
+      render();
+      return true;
+    }catch(e){ return false; }
+  };
+
+  NN.clear = function(){ NN.draft=null; var i=document.getElementById('anvNNIn'); if(i) i.value=''; render(); };
+
+  /* ---------- giao diện ---------- */
+  var BTN  = 'cursor:pointer;text-align:center;padding:12px;border-radius:12px;background:var(--brand);color:#fff;font-weight:700;font-size:14px;';
+  var BTN2 = 'cursor:pointer;text-align:center;padding:10px 12px;border-radius:12px;background:var(--field);color:var(--ink);font-weight:600;font-size:13px;';
+  var CHIP = 'cursor:pointer;display:inline-block;padding:7px 11px;border-radius:99px;background:var(--pg);border:1px solid var(--line);font-size:12.5px;color:var(--ink2);margin:0 6px 6px 0;';
+
+  var ROWS = [
+    ['floors','Số tầng nổi','tầng'],
+    ['fa','DT 1 tầng','m²'],
+    ['bsmt','Số tầng hầm','tầng'],
+    ['faHam','DT 1 tầng hầm','m²'],
+    ['fh','Chiều cao 1 tầng','m'],
+    ['pccc','Chiều cao PCCC','m']
+  ];
+  var TAG = { doan:'· hiểu vậy', suy:'· tự tính' };
+
+  function cardHTML(d){
+    var h = '';
+    if(d.said){
+      h += '<div style="display:flex;justify-content:flex-end;margin-bottom:8px;">'
+        +  '<div style="max-width:88%;background:var(--brand);color:#fff;border-radius:14px 14px 4px 14px;padding:9px 12px;font-size:13.5px;line-height:1.5;">'+esc(d.said)+'</div></div>';
+    }
+    h += '<div id="anvNNCard" style="background:var(--card);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:12px;">';
+
+    if(d.code){
+      h += '<div style="font-size:12.5px;color:var(--ink2);">Công trình</div>'
+        +  '<div style="font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.45;margin-top:2px;">'+esc(d.name||'')+'</div>'
+        +  '<div data-nn="retype" style="'+CHIP+'margin-top:8px;">Chọn lại loại công trình</div>';
+    } else if(d.cands && d.cands.length){
+      h += '<div style="font-size:13.5px;color:var(--ink);font-weight:600;">Anh chọn đúng loại công trình:</div>';
+      d.cands.forEach(function(c){
+        h += '<div data-nn="pick" data-code="'+esc(c.code)+'" style="cursor:pointer;margin-top:7px;padding:11px 12px;border-radius:12px;background:var(--pg);border:1px solid var(--line);font-size:13.5px;color:var(--ink);line-height:1.45;">'+esc(c.name)+'</div>';
+      });
+      h += '<div data-nn="retype" style="'+CHIP+'margin-top:8px;">Không mục nào đúng — mở danh mục</div>';
+    } else {
+      h += '<div style="font-size:13.5px;color:var(--ink);line-height:1.5;">Chưa nhận ra loại công trình'+(d.typeQ?(' từ “'+esc(d.typeQ)+'”'):'')+'.</div>'
+        +  '<div data-nn="retype" style="'+CHIP+'margin-top:8px;">Mở danh mục để chọn</div>';
+    }
+
+    var any = false, rows = '';
+    ROWS.forEach(function(r){
+      var k = r[0], v = d.vals[k];
+      if(v==null) return;
+      any = true;
+      if(d.editing===k){
+        rows += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line);">'
+          + '<span style="flex:1;font-size:13px;color:var(--ink2);">'+r[1]+'</span>'
+          + '<input id="anvNNEdit" type="text" inputmode="decimal" value="'+esc(fmt(v))+'" style="width:92px;box-sizing:border-box;padding:8px 10px;border-radius:10px;border:1px solid var(--brand);background:var(--card);color:var(--ink);font-size:15px;font-weight:700;text-align:right;font-family:inherit;outline:none;">'
+          + '<span data-nn="save" data-k="'+k+'" style="'+BTN2+'padding:8px 11px;">Lưu</span></div>';
+      } else {
+        var tag = TAG[d.from[k]] ? (' <span style="color:var(--ink3);font-weight:600;">'+TAG[d.from[k]]+'</span>') : '';
+        rows += '<div data-nn="edit" data-k="'+k+'" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line);">'
+          + '<span style="font-size:13px;color:var(--ink2);">'+r[1]+tag+'</span>'
+          + '<span style="font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;">'+fmt(v)+' '+r[2]+'</span></div>';
+      }
+    });
+    if(any) h += '<div style="margin-top:10px;">'+rows+'</div>'
+      + '<div style="font-size:12px;color:var(--ink3);margin-top:7px;line-height:1.5;">Chạm một dòng để sửa số.</div>';
+    else h += '<div style="margin-top:10px;font-size:13px;color:var(--ink2);line-height:1.5;">Chưa nghe ra số đo nào. Anh gõ thêm, ví dụ “2 tầng, 500m2 mỗi tầng, cao 4m”.</div>';
+
+    if(d.from.fh==='doan'){
+      h += '<div style="margin-top:8px;"><span data-nn="swaph" style="'+CHIP+'">'+fmt(d.vals.fh)+' m là chiều cao PCCC, không phải cao 1 tầng</span></div>';
+    }
+    if(d.from.pccc==='suy'){
+      h += '<div style="font-size:12px;color:var(--ink3);line-height:1.5;margin-top:6px;">Chiều cao PCCC lấy (số tầng − 1) × chiều cao 1 tầng. Anh kiểm lại theo mặt bằng thật.</div>';
+    }
+    if(d.from.fa==='suy'){
+      h += '<div style="font-size:12px;color:var(--ink3);line-height:1.5;margin-top:6px;">DT 1 tầng chia từ tổng diện tích Anh đọc.</div>';
+    }
+
+    (d.asks||[]).forEach(function(q){
+      h += '<div style="margin-top:11px;padding:10px 11px;border-radius:12px;background:var(--pg);border:1px dashed var(--brand);">'
+        +  '<div style="font-size:13px;color:var(--ink);line-height:1.5;">'+esc(q.q)+'</div><div style="margin-top:8px;display:flex;gap:8px;">';
+      q.opts.forEach(function(o){
+        h += '<div data-nn="ans" data-ask="'+esc(q.id)+'" data-key="'+esc(o.key)+'" style="'+BTN2+'flex:1;">'+esc(o.label)+'</div>';
+      });
+      h += '</div></div>';
+    });
+
+    var ready = !!d.code && !(d.asks||[]).length;
+    h += '<div style="display:flex;gap:8px;margin-top:12px;">'
+      +  '<div data-nn="apply" style="'+BTN+'flex:1;'+(ready?'':'opacity:.45;')+'">Điền vào</div>'
+      +  '<div data-nn="clear" style="'+BTN2+'">Xoá</div></div>';
+    if(!ready){
+      h += '<div style="font-size:12px;color:var(--ink3);margin-top:7px;line-height:1.5;">'
+        + (d.code ? 'Trả lời câu hỏi ở trên rồi bấm Điền vào.' : 'Chọn loại công trình rồi bấm Điền vào.') + '</div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function render(){
+    var box = document.getElementById('anvNN'); if(!box) return;
+    var d = NN.draft;
+    var h = '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;">'
+      + '<div style="font-size:13.5px;font-weight:700;color:var(--ink);">Nhập nhanh</div>'
+      + '<div style="font-size:12px;color:var(--ink3);line-height:1.5;margin-top:3px;">Gõ, hoặc bấm micro trên bàn phím rồi nói một câu. Ví dụ: nhà hàng tiệc cưới, 2 tầng, 500m2 mỗi tầng, cao 4m.</div>'
+      + '<div style="display:flex;gap:8px;margin-top:9px;">'
+      + '<input id="anvNNIn" type="text" autocomplete="off" placeholder="Gõ hoặc nói một câu…" '
+      + 'style="flex:1;min-width:0;box-sizing:border-box;padding:12px 13px;border-radius:12px;border:1px solid var(--line);background:var(--pg);color:var(--ink);font-size:16px;font-family:inherit;outline:none;">'
+      + '<div data-nn="send" style="'+BTN+'padding:12px 16px;">Đọc</div></div>';
+
+    var hs = hist();
+    if(!d && hs.length){
+      h += '<div style="margin-top:10px;font-size:12px;color:var(--ink3);">Câu đã dùng</div><div style="margin-top:6px;">';
+      hs.forEach(function(q){ h += '<span data-nn="again" data-q="'+esc(q)+'" style="'+CHIP+'">'+esc(q.length>42?(q.slice(0,42)+'…'):q)+'</span>'; });
+      h += '</div>';
+    }
+    h += '</div>';
+    if(d) h += '<div style="margin-bottom:12px;">'+cardHTML(d)+'</div>';
+    box.innerHTML = h;
+    if(d && d.editing){ var e=document.getElementById('anvNNEdit'); if(e){ try{ e.focus(); e.select(); }catch(x){} } }
+  }
+  NN.render = render;
+
+  function send(){
+    var inp = document.getElementById('anvNNIn'); if(!inp) return;
+    var q = String(inp.value||'').trim(); if(!q) return;
+    NN.feed(q);
+    inp.value = '';
+    render();
+  }
+
+  /* ---------- bắt sự kiện ---------- */
+  document.addEventListener('click', function(ev){
+    var el = ev.target.closest && ev.target.closest('[data-nn]'); if(!el) return;
+    var k = el.getAttribute('data-nn');
+    if(k==='send'){ send(); return; }
+    if(k==='again'){ var q=el.getAttribute('data-q')||''; NN.feed(q); render(); return; }
+    if(k==='pick'){ NN.pick(el.getAttribute('data-code')); render(); return; }
+    if(k==='ans'){ NN.answer(el.getAttribute('data-ask'), el.getAttribute('data-key')); render(); return; }
+    if(k==='swaph'){ NN.swapHeight(); render(); return; }
+    if(k==='edit'){ if(NN.draft){ NN.draft.editing = el.getAttribute('data-k'); render(); } return; }
+    if(k==='save'){ var e=document.getElementById('anvNNEdit'); NN.setVal(el.getAttribute('data-k'), e?e.value:''); render(); return; }
+    if(k==='apply'){ NN.apply(); return; }
+    if(k==='clear'){ NN.clear(); return; }
+    if(k==='retype'){
+      try{
+        if(window.ACT && ACT.openCat){ ACT.openCat(); if(window.anvRender) anvRender(); }
+        var d = NN.draft;
+        setTimeout(function(){
+          var s=document.getElementById('catSearch');
+          if(s && d && d.typeQ){ s.value=d.typeQ; if(window.anvRenderCatList) anvRenderCatList(d.typeQ); }
+        }, 40);
+      }catch(e){}
+      return;
+    }
+  }, true);
+
+  document.addEventListener('keydown', function(ev){
+    if(ev.key!=='Enter') return;
+    var t = ev.target; if(!t) return;
+    if(t.id==='anvNNIn'){ ev.preventDefault(); send(); return; }
+    if(t.id==='anvNNEdit'){
+      ev.preventDefault();
+      var d = NN.draft; if(d && d.editing){ NN.setVal(d.editing, t.value); render(); }
+      return;
+    }
+  }, true);
+
+  /* Người dùng chọn công trình bằng danh mục trong lúc đang có bản nháp → bỏ nháp, tránh chồng nhau. */
+  document.addEventListener('click', function(ev){
+    var it = ev.target.closest && ev.target.closest('[data-code]');
+    if(!it || (it.getAttribute('data-nn')==='pick')) return;
+    NN.draft = null;
+    setTimeout(render, 0);
+  }, true);
+
+  /* ---------- gắn vào màn Chọn công trình ---------- */
+  function boot(){
+    if(!document.getElementById('anvNN')) return setTimeout(boot, 200);
+    render();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(boot, 80); });
+  else setTimeout(boot, 80);
+})();
+
 </script>
 </body></html>
